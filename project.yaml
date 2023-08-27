@@ -1,0 +1,35 @@
+kind: project
+metadata:
+  name: call-center-demo-guyl
+  created: '2023-08-27T14:56:53.122000'
+spec:
+  params:
+    source: git://github.com/mlrun/demo-call-center.git#main
+    default_image: giladsh28/llm:v3
+    gpus: 4
+  functions:
+  - url: hub://transcribe
+    name: transcribe
+  - url: hub://pii_recognizer
+    name: pii-recognizer
+  - url: hub://question_answering
+    name: question-answering
+  - url: ./src/postprocess.py
+    name: postprocess
+    kind: job
+  workflows:
+  - path: ./src/workflow.py
+    name: workflow
+  artifacts: []
+  conda: ''
+  source: git://github.com/mlrun/demo-call-center.git#main
+  load_source_on_run: true
+  desired_state: online
+  owner: guyl
+  default_image: giladsh28/llm:v3
+  build:
+    commands: []
+    requirements: []
+  custom_packagers: []
+status:
+  state: online

@@ -1,9 +1,7 @@
-# TODO: Update with relevant requirements (current llm-demo)
-FROM mlrun/ml-models-gpu:1.3.0
-RUN pip install -U transformers[deepspeed]
-RUN pip install -U datasets
-RUN pip install -U accelerate
-RUN pip install -U evaluate
-RUN pip install -U protobuf==3.20.*
-RUN pip install -U mpi4py
-RUN conda install -c "nvidia/label/cuda-11.7.1" cuda-nvprof
+FROM mlrun/mlrun-gpu
+RUN apt-get update -y
+RUN apt-get install ffmpeg -y
+RUN pip install tqdm torch bitsandbytes transformers accelerate  \
+    openai-whisper streamlit spacy librosa presidio-anonymizer  \
+    presidio-analyzer nltk flair
+RUN python -m spacy download en_core_web_lg
