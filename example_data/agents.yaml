@@ -1,0 +1,32 @@
+kind: artifact
+metadata:
+  key: agents
+  project: call-center-demo-2-yonis
+  iter: 0
+  tree: 4c60fbe6-d558-471a-8961-3b52ce1246fe
+  hash: ce40bd1de6d31bce57d8fad973f2701c899ab149
+  tag: latest
+  updated: '2024-01-18T07:15:05.400296+00:00'
+  labels:
+    workflow-id: 4c60fbe6-d558-471a-8961-3b52ce1246fe
+spec:
+  src_path: /tmp/tmp_x_v9g3w/agents.json
+  target_path: v3io:///projects/call-center-demo-2-yonis/artifacts/4c60fbe6-d558-471a-8961-3b52ce1246fe/agent-data-generator/0/agents.json
+  size: 1052
+  db_key: agent-data-generator_agents
+  unpackaging_instructions:
+    packager_name: ListPackager
+    object_type: builtins.list
+    artifact_type: file
+    instructions:
+      file_format: json
+  producer:
+    name: agent-data-generator
+    kind: run
+    uri: call-center-demo-2-yonis/f3f508782f7b4b829207473435bdf78b
+    owner: yonis
+    workflow: 4c60fbe6-d558-471a-8961-3b52ce1246fe
+  sources: []
+  license: ''
+status:
+  state: created

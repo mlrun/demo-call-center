@@ -1,0 +1,152 @@
+kind: dataset
+metadata:
+  key: calls_batch
+  project: call-center-demo-2-yonis
+  iter: 0
+  tree: 4c60fbe6-d558-471a-8961-3b52ce1246fe
+  tag: latest
+  updated: '2024-01-18T07:53:37.976456+00:00'
+  labels:
+    workflow-id: 4c60fbe6-d558-471a-8961-3b52ce1246fe
+spec:
+  target_path: v3io:///projects/call-center-demo-2-yonis/artifacts/4c60fbe6-d558-471a-8961-3b52ce1246fe/batch-creation/0/calls_batch.parquet
+  format: parquet
+  size: 6265
+  db_key: batch-creation_calls_batch
+  unpackaging_instructions:
+    packager_name: PandasDataFramePackager
+    object_type: pandas.core.frame.DataFrame
+    artifact_type: dataset
+    instructions: {}
+  schema:
+    fields:
+    - name: index
+      type: integer
+    - name: index
+      type: integer
+    - name: call_id
+      type: string
+    - name: client_id
+      type: string
+    - name: agent_id
+      type: string
+    - name: date
+      type: string
+    - name: time
+      type: string
+    - name: audio_file
+      type: string
+    primaryKey:
+    - index
+    pandas_version: 1.4.0
+  header:
+  - index
+  - call_id
+  - client_id
+  - agent_id
+  - date
+  - time
+  - audio_file
+  length: 8
+  producer:
+    name: batch-creation
+    kind: run
+    uri: call-center-demo-2-yonis/e8e1bbd838d7430c8a649ee337a4322d
+    owner: yonis
+    workflow: 4c60fbe6-d558-471a-8961-3b52ce1246fe
+  sources:
+  - name: conversations_data
+    path: store://artifacts/call-center-demo-2-yonis/conversation-generation_metadata:4c60fbe6-d558-471a-8961-3b52ce1246fe
+  - name: audio_files
+    path: store://artifacts/call-center-demo-2-yonis/text-to-audio_audio_files_dataframe:4c60fbe6-d558-471a-8961-3b52ce1246fe
+  license: ''
+status:
+  state: created
+  stats:
+    call_id:
+      count: 8
+      unique: 8
+      top: 48682a99ddf95be4a4ce6e3db2bee39c
+      freq: 1
+    client_id:
+      count: 8
+      unique: 8
+      top: '006'
+      freq: 1
+    agent_id:
+      count: 8
+      unique: 7
+      top: P7Q8R9
+      freq: 2
+    date:
+      count: 8
+      unique: 2
+      top: '2023-10-31'
+      freq: 5
+    time:
+      count: 8
+      unique: 8
+      top: '13:14:59'
+      freq: 1
+    audio_file:
+      count: 8
+      unique: 8
+      top: 48682a99ddf95be4a4ce6e3db2bee39c.wav
+      freq: 1
+  preview:
+  - - 0
+    - 48682a99ddf95be4a4ce6e3db2bee39c
+    - '006'
+    - S1T2U3
+    - '2023-10-30'
+    - '13:14:59'
+    - 48682a99ddf95be4a4ce6e3db2bee39c.wav
+  - - 2
+    - b48686c252c48dc93226d286cd4c9964
+    - '007'
+    - A1B2C3
+    - '2023-10-31'
+    - '13:34:51'
+    - b48686c252c48dc93226d286cd4c9964.wav
+  - - 3
+    - 57778f809575cce2c40010a232cdcd31
+    - '002'
+    - G7H8I9
+    - '2023-10-31'
+    - '15:59:35'
+    - 57778f809575cce2c40010a232cdcd31.wav
+  - - 4
+    - 51903aa24e3fb63147a396eb392fa54f
+    - '001'
+    - M4N5O6
+    - '2023-10-31'
+    - '10:38:37'
+    - 51903aa24e3fb63147a396eb392fa54f.wav
+  - - 5
+    - 033ab8d8cbffd031a86bcc22c239cc2f
+    - '004'
+    - P7Q8R9
+    - '2023-10-30'
+    - '10:24:17'
+    - 033ab8d8cbffd031a86bcc22c239cc2f.wav
+  - - 6
+    - 5be7b2e8a7d370e9e9c8a42a9a78114b
+    - '005'
+    - P7Q8R9
+    - '2023-10-31'
+    - 09:18:23
+    - 5be7b2e8a7d370e9e9c8a42a9a78114b.wav
+  - - 7
+    - 8a894d6a850bfe19415a00dc6752c847
+    - 009
+    - V4W5X6
+    - '2023-10-31'
+    - '11:36:26'
+    - 8a894d6a850bfe19415a00dc6752c847.wav
+  - - 9
+    - fbe10d8b34a0f8ac68b096b984f89025
+    - 008
+    - B1C2D3
+    - '2023-10-30'
+    - 09:37:54
+    - fbe10d8b34a0f8ac68b096b984f89025.wav

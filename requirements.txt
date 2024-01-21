@@ -1,13 +1,2 @@
-tqdm 
-torch
-bitsandbytes
-transformers
-accelerate
-openai-whisper
-streamlit
-spacy
-librosa
-presidio-anonymizer
-presidio-analyzer
-nltk
-flair
+mlrun
+SQLAlchemy
