@@ -87,11 +87,14 @@ def _insert_agents_and_clients_to_db(agents: list, clients: list):
 
 def _import_artifacts(project, step_name: str, artifact_directory: Path):
     print(f"- logging step {step_name}")
+
     # iterate over artifacts and log them:
     for artifact_file in artifact_directory.iterdir():
-        if  artifact_file.is_file():
+        if artifact_file.is_file():
+            artifact_key = f"{step_name}_{artifact_file.stem}"
             artifact = project.import_artifact(
                 item_path=str(artifact_file),
+                new_key=artifact_key,
             )
             print(f"    - artifact {artifact.key} imported")
 
@@ -103,11 +106,11 @@ def save_current_example_data():
         ("client-data-generator_clients", "clients.yaml"),
         ("agent-data-generator_agents", "agents.yaml"),
         ("conversation-generation_conversations", "conversation_generation/conversations.zip"),
-        ("conversation-generation_metadata", "conversation_generation/metadata.yaml"),
-        ("conversation-generation_ground_truths", "conversation_generation/ground_truths.yaml"),
+        ("conversation-generation_metadata", "conversation_generation/metadata.zip"),
+        ("conversation-generation_ground_truths", "conversation_generation/ground_truths.zip"),
         ("text-to-audio_audio_files", "text_to_audio/audio_files.zip"),
-        ("text-to-audio_audio_files_dataframe", "text_to_audio/dataframe.yaml"),
-        ("batch-creation_calls_batch", "batch_creation/calls_batch.yaml"),
+        ("text-to-audio_audio_files_dataframe", "text_to_audio/dataframe.zip"),
+        ("batch-creation_calls_batch", "batch_creation/calls_batch.zip"),
     ]:
         project.get_artifact(artifact_name).export(f"example_data/{target_path}")
         print(f"- exported {artifact_name} to {target_path}")
