@@ -66,9 +66,9 @@ def generate_multi_speakers_audio(
                                 - The generated audio files dataframe.
                                 - The errors dictionary.
     """
-
     global _LOGGER
     _LOGGER = _get_logger()
+
     # Get the input text files to turn to audio:
     data_path = pathlib.Path(data_path).absolute()
     text_files = _get_text_files(data_path=data_path)
@@ -116,11 +116,9 @@ def generate_multi_speakers_audio(
         output_directory.mkdir(exist_ok=True, parents=True)
 
     # Start generating audio:
-    # Go over the audio files and transcribe:
     for text_file in tqdm.tqdm(
         text_files, desc="Generating", unit="file", disable=not verbose
     ):
-
         try:
             # Randomize voices for each speaker:
             chosen_voices = {}
@@ -138,11 +136,9 @@ def generate_multi_speakers_audio(
                 if speaker_per_channel
                 else {"all": []}
             )
-
             # Generate audio per line:
             for line in text.splitlines():
                 # Validate line is in correct speaker format:
-
                 if ": " not in line:
                     if verbose:
                         _LOGGER.warning(f"Skipping line: {line}")
@@ -171,7 +167,6 @@ def generate_multi_speakers_audio(
                     else:
                         audio_pieces["all"] += [audio, gap_between_speakers]
             # Construct a single audio array from all the pieces and channels:
-
             audio = np.vstack(
                 [np.concatenate(audio_pieces[speaker]) for speaker in speakers]
             ).astype(dtype=np.float32)
@@ -180,7 +175,6 @@ def generate_multi_speakers_audio(
             audio = resampler(audio)
             # Save to audio file:
             audio_file = output_directory / f"{text_file.stem}.{file_format}"
-
             torchaudio.save(
                 uri=str(audio_file),
                 src=audio,
@@ -188,7 +182,6 @@ def generate_multi_speakers_audio(
                 format=file_format,
                 bits_per_sample=bits_per_sample,
             )
-
             # Collect to the successes:
             successes.append([text_file.name, audio_file.name])
         except Exception as exception:

@@ -21,9 +21,11 @@ from langchain.chat_models import ChatOpenAI
 def _set_openai_secrets() -> bool:
     key = "OPENAI_API_KEY"
     base = "OPENAI_API_BASE"
+
     # Check if the key is already in the environment variables:
     if key in os.environ and base in os.environ:
         return True
+
     # Check if mlrun is installed:
     try:
         import mlrun
@@ -31,7 +33,7 @@ def _set_openai_secrets() -> bool:
         raise EnvironmentError(
             f"One or more of the OpenAI required environment variables ('{key}', '{base}') are missing."
             f"Please set them as environment variables or install mlrun (`pip install mlrun`)"
-            f"and set them as project secrets using `projecy.set_secrets`."
+            f"and set them as project secrets using `project.set_secrets`."
         )
 
     # Check if the key is in the secrets:
