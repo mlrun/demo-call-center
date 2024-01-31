@@ -61,6 +61,9 @@ def setup(
         mysql_url=mysql_url,
     )
 
+    # Refresh MLRun hub to the most up-to-date version:
+    mlrun.get_run_db().get_hub_catalog(source_name="default", force_refresh=True)
+
     # Set the functions:
     _set_calls_generation_functions(project=project, gpus=gpus, node_name=node_name)
     _set_calls_analysis_functions(project=project, gpus=gpus, node_name=node_name)
@@ -118,17 +121,18 @@ def _set_secrets(
 
 
 def _set_function(
-    project: mlrun.projects.MlrunProject,
-    func: str,
-    name: str,
-    kind: str,
-    gpus: int = 0,
-    node_name: str = None,
-    image: str = None,
+        project: mlrun.projects.MlrunProject,
+        func: str,
+        name: str,
+        kind: str,
+        gpus: int = 0,
+        node_name: str = None,
+        image: str = None,
 ):
     # Set the given function:
+    with_repo = not func.startswith("hub://")
     mlrun_function = project.set_function(
-        func=func, name=name, kind=kind, with_repo=True, image=image,
+        func=func, name=name, kind=kind, with_repo=with_repo, image=image,
     )
 
     # Configure GPUs according to the given kind:
@@ -153,12 +157,10 @@ def _set_calls_generation_functions(
     gpus: int,
     node_name: str = None
 ):
-    import os
-    print(os.system("ls -l"))
     # Client and agent data generator
     _set_function(
         project=project,
-        func="./src/hub_functions/structured_data_generator.py",
+        func="hub://structured_data_generator",
         name="structured-data-generator",
         kind="job",
         node_name=node_name,
@@ -176,7 +178,7 @@ def _set_calls_generation_functions(
     # Text to audio generator:
     _set_function(
         project=project,
-        func="./src/hub_functions/text_to_audio_generator.py",
+        func="hub://text_to_audio_generator",
         name="text-to-audio-generator",
         kind="job",  # TODO: MPI once MLRun supports it out of the box
         gpus=gpus,
@@ -200,7 +202,7 @@ def _set_calls_analysis_functions(
     # Speech diarization:
     _set_function(
         project=project,
-        func="./src/hub_functions/silero_vad.py",
+        func="hub://silero_vad",
         name="silero-vad",
         kind="job",
         node_name=node_name,
@@ -209,18 +211,8 @@ def _set_calls_analysis_functions(
     # Transcription:
     _set_function(
         project=project,
-        func="./src/hub_functions/transcribe.py",
+        func="hub://transcribe",
         name="transcription",
-        kind="mpijob" if gpus > 1 else "job",
-        gpus=gpus,
-        node_name=node_name,
-    )
-
-    # Translation:
-    _set_function(
-        project=project,
-        func="./src/hub_functions/translate.py",
-        name="translation",
         kind="mpijob" if gpus > 1 else "job",
         gpus=gpus,
         node_name=node_name,
@@ -229,7 +221,7 @@ def _set_calls_analysis_functions(
     # PII recognition:
     _set_function(
         project=project,
-        func="./src/hub_functions/pii_recognizer.py",
+        func="hub://pii_recognizer",
         name="pii-recognition",
         kind="job",
         node_name=node_name,
@@ -239,7 +231,7 @@ def _set_calls_analysis_functions(
     # Question answering:
     _set_function(
         project=project,
-        func="./src/hub_functions/question_answering.py",
+        func="hub://question_answering",
         name="question-answering",
         kind="job",
         gpus=gpus,
