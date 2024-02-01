@@ -1,32 +1,55 @@
 kind: project
 metadata:
-  name: call-center-demo-guyl
-  created: '2023-08-27T14:56:53.122000'
+  name: call-center-demo
+  created: '2024-01-31T09:14:14.311000'
 spec:
   params:
     source: git://github.com/mlrun/demo-call-center.git#main
-    default_image: giladsh28/llm:v3
-    gpus: 4
+    default_image: yonishelach/call-center-11.8:1
+    gpus: 2
   functions:
+  - url: hub://structured_data_generator
+    name: structured-data-generator
+    kind: job
+  - url: ./src/calls_generation/conversations_generator.py
+    name: conversations-generator
+    kind: job
+    with_repo: true
+  - url: hub://text_to_audio_generator
+    name: text-to-audio-generator
+    kind: job
+  - url: ./src/calls_analysis/db_management.py
+    name: db-management
+    kind: job
+    with_repo: true
+  - url: hub://silero_vad
+    name: silero-vad
+    kind: job
   - url: hub://transcribe
-    name: transcribe
+    name: transcription
+    kind: mpijob
   - url: hub://pii_recognizer
-    name: pii-recognizer
+    name: pii-recognition
+    kind: job
+    image: guyliguazio/call-center-11.8:1.4.1.6
   - url: hub://question_answering
     name: question-answering
-  - url: ./src/postprocess.py
-    name: postprocess
     kind: job
+  - url: ./src/calls_analysis/postprocessing.py
+    name: postprocessing
+    kind: job
+    with_repo: true
   workflows:
-  - path: ./src/workflow.py
-    name: workflow
+  - path: ./src/workflows/calls_generation.py
+    name: calls-generation
+  - path: ./src/workflows/calls_analysis.py
+    name: calls-analysis
   artifacts: []
   conda: ''
   source: git://github.com/mlrun/demo-call-center.git#main
   load_source_on_run: true
   desired_state: online
-  owner: guyl
-  default_image: giladsh28/llm:v3
+  default_image: yonishelach/call-center-11.8:1
   build:
     commands: []
     requirements: []
