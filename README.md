@@ -47,7 +47,7 @@ If you prefer to use Conda, use this instead (to create and configure a conda en
 
 The MLRun service and computation can run locally (minimal setup) or over a remote Kubernetes environment.
 
-If your development environment supports Docker and these are sufficient CPU resources, run:
+If your development environment supports Docker and there are sufficient CPU resources, run:
 
     make mlrun-docker
     
