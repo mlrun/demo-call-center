@@ -9,15 +9,15 @@ MLRun automates the entire workflow, auto-scales resources as needed, and automa
 By the end of this demo you will see the potential power of LLMs for feature extraction, and how easily you can do this with MLRun!
 
 This demo uses:
-* [**OpenAI's Whisper**](https://openai.com/research/whisper) - To transcribe the audio calls into text.
+* [**OpenAI's Whisper**](https://openai.com/research/whisper) &mdash; To transcribe the audio calls into text.
 * [**Flair**](https://flairnlp.github.io/) and [**Microsoft's Presidio**](https://microsoft.github.io/presidio/) - To recognize PII so it can be filtered out.
-* [**HuggingFace**](https://huggingface.co/) - The main machine learning framework to get the model and tokenizer for the features extraction. The demo uses [tiiuae/falcon-40b-instruct](https://huggingface.co/tiiuae/falcon-40b-instruct) as the LLM to answer questions.
-* and [**MLRun**](https://www.mlrun.org/) - as the orchestrator to operationalize the workflow.
+* [**HuggingFace**](https://huggingface.co/) &mdash; The main machine-learning framework to get the model and tokenizer for the features extraction. The demo uses [tiiuae/falcon-40b-instruct](https://huggingface.co/tiiuae/falcon-40b-instruct) as the LLM to answer questions.
+* and [**MLRun**](https://www.mlrun.org/) &mdash; as the orchestrator to operationalize the workflow.
 
 The demo contains a single [notebook](./notebook.ipynb) that encompasses the entire demo.
 
 
-Most of the functions are imported from [MLRun's hub](https://docs.mlrun.org/en/stable/runtimes/load-from-hub.html), which contains a wide range of functions that can be used for a variety of use cases. All functions used in the demo include links to their source in the hub. All of the python source code is under [/src](./src).
+Most of the functions are imported from [MLRun's function hub](https://docs.mlrun.org/en/stable/runtimes/load-from-hub.html), which contains a wide range of functions that can be used for a variety of use cases. All functions used in the demo include links to their source in the hub. All of the python source code is under [/src](./src).
 Enjoy!
 
 ___
@@ -62,5 +62,5 @@ For MLRun to run properly you should set your client environment. This is not re
 Your environment should include `MLRUN_ENV_FILE=<absolute path to the ./mlrun.env file> ` (point to the mlrun .env file 
 in this repo); see [mlrun client setup](https://docs.mlrun.org/en/latest/install/remote.html) instructions for details.  
      
-> Note: You can also use a remote MLRun service (over Kubernetes), instead of starting a local mlrun: 
+> Note: You can also use a remote MLRun service (over Kubernetes): instead of starting a local mlrun: 
 > edit the [mlrun.env](./mlrun.env) and specify its address and credentials.
