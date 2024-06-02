@@ -23,7 +23,7 @@ from src.common import ProjectSecrets
 import mlrun
 
 
-def log_example():
+def skip_and_import_local_data():
     """
     This function logs example data to the database and to the project.
     Call this function from the notebook in order to skip the calls generation workflow.
@@ -42,14 +42,12 @@ def log_example():
     print("- Initialized tables")
 
     # load agent and client data:
-    # import artifacts from exported files and convert to data item:
     agents = project.import_artifact(
-        item_path=str(example_data_dir / "agents.yaml")
+        item_path=str(example_data_dir / "agents.zip"),
     ).to_dataitem()
     clients = project.import_artifact(
-        item_path=str(example_data_dir / "clients.yaml")
+        item_path=str(example_data_dir / "clients.zip"),
     ).to_dataitem()
-    # get data in bytes and load as list of dictionaries:
     agents = yaml.load(agents.get(), Loader=yaml.FullLoader)
     clients = yaml.load(clients.get(), Loader=yaml.FullLoader)
 
@@ -63,9 +61,9 @@ def log_example():
         ("text-to-audio", example_data_dir / "text_to_audio"),
         ("batch-creation", example_data_dir / "batch_creation"),
     ]:
+        print(f"- logging step {step_name}")
         _import_artifacts(
             project=project,
-            step_name=step_name,
             artifact_directory=artifact_directory,
         )
 
@@ -85,22 +83,21 @@ def _insert_agents_and_clients_to_db(agents: list, clients: list):
         sess.execute(insert(Client), clients)
 
 
-def _import_artifacts(project, step_name: str, artifact_directory: Path):
-    print(f"- logging step {step_name}")
-
+def _import_artifacts(project, artifact_directory: Path):
     # iterate over artifacts and log them:
     for artifact_file in artifact_directory.iterdir():
         if artifact_file.is_file():
-            artifact_key = f"{step_name}_{artifact_file.stem}"
             artifact = project.import_artifact(
                 item_path=str(artifact_file),
-                new_key=artifact_key,
             )
             print(f"    - artifact {artifact.key} imported")
 
 
 def save_current_example_data():
     project = mlrun.get_current_project()
+    export_dir = Path("example_data")
+    if not export_dir.exists():
+        export_dir.mkdir(parents=True, exist_ok=True)
 
     for artifact_name, target_path in [
         ("client-data-generator_clients", "clients.yaml"),
@@ -112,6 +109,9 @@ def save_current_example_data():
         ("text-to-audio_audio_files_dataframe", "text_to_audio/dataframe.zip"),
         ("batch-creation_calls_batch", "batch_creation/calls_batch.zip"),
     ]:
+        export_path = export_dir / target_path
+        if not export_path.exists():
+            export_path.parent.mkdir(parents=True, exist_ok=True)
         project.get_artifact(artifact_name).export(f"example_data/{target_path}")
         print(f"- exported {artifact_name} to {target_path}")
     print("*** all artifacts exported successfully ***")
