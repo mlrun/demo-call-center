@@ -86,8 +86,8 @@ def pipeline(
                 "model_name": generation_model,
                 "language": language,
                 "fields": [
-                    "first_name: in spanish, no special characters",
-                    "last_name: in spanish, no special characters",
+                    f"first_name: in {language}, no special characters",
+                    f"last_name: in {language}, no special characters",
                     "agent_id",
                 ],
             },
