@@ -100,8 +100,8 @@ def save_current_example_data():
         export_dir.mkdir(parents=True, exist_ok=True)
 
     for artifact_name, target_path in [
-        ("client-data-generator_clients", "clients.yaml"),
-        ("agent-data-generator_agents", "agents.yaml"),
+        ("client-data-generator_clients", "clients.zip"),
+        ("agent-data-generator_agents", "agents.zip"),
         ("conversation-generation_conversations", "conversation_generation/conversations.zip"),
         ("conversation-generation_metadata", "conversation_generation/metadata.zip"),
         ("conversation-generation_ground_truths", "conversation_generation/ground_truths.zip"),
