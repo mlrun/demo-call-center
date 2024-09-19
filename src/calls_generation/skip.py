@@ -100,13 +100,13 @@ def save_current_example_data():
         export_dir.mkdir(parents=True, exist_ok=True)
 
     for artifact_name, target_path in [
-        ("client-data-generator_clients", "clients.yaml"),
-        ("agent-data-generator_agents", "agents.yaml"),
+        ("client-data-generator_clients", "clients.zip"),
+        ("agent-data-generator_agents", "agents.zip"),
         ("conversation-generation_conversations", "conversation_generation/conversations.zip"),
         ("conversation-generation_metadata", "conversation_generation/metadata.zip"),
         ("conversation-generation_ground_truths", "conversation_generation/ground_truths.zip"),
         ("text-to-audio_audio_files", "text_to_audio/audio_files.zip"),
-        ("text-to-audio_audio_files_dataframe", "text_to_audio/dataframe.zip"),
+        ("text-to-audio_dataframe", "text_to_audio/dataframe.zip"),
         ("batch-creation_calls_batch", "batch_creation/calls_batch.zip"),
     ]:
         export_path = export_dir / target_path

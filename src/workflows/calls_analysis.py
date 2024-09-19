@@ -234,6 +234,7 @@ def pipeline(
         params={
             "verbose": True,
             "model_name": question_answering_model,
+            # We don't need the auto_gptq_exllama if using CPU, we do need it if using GPU
             "auto_gptq_exllama_max_input_length": 8192,
             "device_map": "auto",
             "text_wrapper": TEXT_WRAPPER,
