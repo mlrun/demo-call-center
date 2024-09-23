@@ -1,12 +1,16 @@
-kind: project
-metadata:
-  name: call-center-demo
-  created: '2024-01-31T09:14:14.311000'
 spec:
-  params:
-    source: git://github.com/mlrun/demo-call-center.git#main
-    default_image: yonishelach/call-center-11.8:1
-    gpus: 2
+  desired_state: online
+  workflows:
+  - path: ./src/workflows/calls_generation.py
+    name: calls-generation
+  - path: ./src/workflows/calls_analysis.py
+    name: calls-analysis
+  conda: ''
+  default_image: yonishelach/call-center-transformers
+  owner: shapira
+  origin_url: git://github.com/GiladShapira94/demo-call-center.git#refs/heads/main
+  source: git://github.com/mlrun/demo-call-center.git#main
+  load_source_on_run: true
   functions:
   - url: hub://structured_data_generator
     name: structured-data-generator
@@ -27,7 +31,7 @@ spec:
     kind: job
   - url: hub://transcribe
     name: transcription
-    kind: mpijob
+    kind: job
   - url: hub://pii_recognizer
     name: pii-recognition
     kind: job
@@ -39,20 +43,13 @@ spec:
     name: postprocessing
     kind: job
     with_repo: true
-  workflows:
-  - path: ./src/workflows/calls_generation.py
-    name: calls-generation
-  - path: ./src/workflows/calls_analysis.py
-    name: calls-analysis
-  artifacts: []
-  conda: ''
-  source: git://github.com/mlrun/demo-call-center.git#main
-  load_source_on_run: true
-  desired_state: online
-  default_image: yonishelach/call-center-11.8:1
-  build:
-    commands: []
-    requirements: []
-  custom_packagers: []
+  params:
+    source: git://github.com/mlrun/demo-call-center.git#main
+    default_image: yonishelach/call-center-transformers
+    gpus: 1
+kind: project
 status:
   state: online
+metadata:
+  created: '2024-09-23T10:31:40.952000'
+  name: call-center-demo-shapira

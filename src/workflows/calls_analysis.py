@@ -15,7 +15,7 @@ from typing import List
 
 import kfp
 import mlrun
-
+from kfp import dsl
 from src.common import TONES, TOPICS, CallStatus
 
 
@@ -106,12 +106,14 @@ def pipeline(
     pii_recognition_entity_operator_map: List[str],
     question_answering_model: str,
     batch_size: int = 2,
+    auto_gptq_exllama_max_input_length:int = None,
+    insert_calls_db: bool = True,
 ):
     # Get the project:
     project = mlrun.get_current_project()
-
-    # Insert new calls:
     db_management_function = project.get_function("db-management")
+    # with dsl.Condition(insert_calls_db == True) as insert_calls_condition:
+# Insert new calls:
     insert_calls_run = project.run_function(
         db_management_function,
         handler="insert_calls",
@@ -235,7 +237,7 @@ def pipeline(
             "verbose": True,
             "model_name": question_answering_model,
             # We don't need the auto_gptq_exllama if using CPU, we do need it if using GPU
-            "auto_gptq_exllama_max_input_length": 8192,
+            "auto_gptq_exllama_max_input_length": auto_gptq_exllama_max_input_length,
             "device_map": "auto",
             "text_wrapper": TEXT_WRAPPER,
             "questions": QUESTIONS,
