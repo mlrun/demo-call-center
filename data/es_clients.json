@@ -1,0 +1,72 @@
+[
+    {
+        "first_name": "Carlos",
+        "last_name": "Gomez",
+        "phone_number": "678-234-5678",
+        "email": "CarlosGomez@email.com",
+        "client_id": "ID001"
+    },
+    {
+        "first_name": "Maria",
+        "last_name": "Hernandez",
+        "phone_number": "789-345-6789",
+        "email": "MariaHernandez@email.com",
+        "client_id": "ID002"
+    },
+    {
+        "first_name": "Luis",
+        "last_name": "Rodriguez",
+        "phone_number": "890-456-7890",
+        "email": "LuisRodriguez@email.com",
+        "client_id": "ID003"
+    },
+    {
+        "first_name": "Ana",
+        "last_name": "Sanchez",
+        "phone_number": "901-567-8901",
+        "email": "AnaSanchez@email.com",
+        "client_id": "ID004"
+    },
+    {
+        "first_name": "Jose",
+        "last_name": "Martinez",
+        "phone_number": "012-678-9012",
+        "email": "JoseMartinez@email.com",
+        "client_id": "ID005"
+    },
+    {
+        "first_name": "Isabel",
+        "last_name": "Lopez",
+        "phone_number": "123-789-0123",
+        "email": "IsabelLopez@email.com",
+        "client_id": "ID006"
+    },
+    {
+        "first_name": "Miguel",
+        "last_name": "Gonzalez",
+        "phone_number": "234-890-1234",
+        "email": "MiguelGonzalez@email.com",
+        "client_id": "ID007"
+    },
+    {
+        "first_name": "Sofia",
+        "last_name": "Perez",
+        "phone_number": "345-901-2345",
+        "email": "SofiaPerez@email.com",
+        "client_id": "ID008"
+    },
+    {
+        "first_name": "Antonio",
+        "last_name": "Ramirez",
+        "phone_number": "456-012-3456",
+        "email": "AntonioRamirez@email.com",
+        "client_id": "ID009"
+    },
+    {
+        "first_name": "Carmen",
+        "last_name": "Torres",
+        "phone_number": "567-123-4567",
+        "email": "CarmenTorres@email.com",
+        "client_id": "ID010"
+    }
+]

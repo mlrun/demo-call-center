@@ -137,7 +137,7 @@ def _set_function(
 
     # Configure GPUs according to the given kind:
     if gpus >= 1:
-        mlrun_function.with_node_selection(node_selector={"app.iguazio.com/node-group": "added-t4"})
+        mlrun_function.with_node_selection(node_selector={"alpha.eksctl.io/nodegroup-name": "added-t4"})
         if kind == "mpijob":
             # 1 GPU for each rank:
             mlrun_function.with_limits(gpus=1)

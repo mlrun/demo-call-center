@@ -1,16 +1,17 @@
 spec:
-  desired_state: online
   workflows:
-  - path: ./src/workflows/calls_generation.py
-    name: calls-generation
-  - path: ./src/workflows/calls_analysis.py
-    name: calls-analysis
-  conda: ''
-  default_image: yonishelach/call-center-transformers
+  - name: calls-generation
+    path: ./src/workflows/calls_generation.py
+  - name: calls-analysis
+    path: ./src/workflows/calls_analysis.py
   owner: shapira
-  origin_url: git://github.com/GiladShapira94/demo-call-center.git#refs/heads/main
-  source: git://github.com/mlrun/demo-call-center.git#main
-  load_source_on_run: true
+  conda: ''
+  desired_state: online
+  default_image: yonishelach/call-center-transformers
+  params:
+    source: git://github.com/mlrun/demo-call-center.git#main
+    default_image: yonishelach/call-center-transformers
+    gpus: 0
   functions:
   - url: hub://structured_data_generator
     name: structured-data-generator
@@ -43,13 +44,12 @@ spec:
     name: postprocessing
     kind: job
     with_repo: true
-  params:
-    source: git://github.com/mlrun/demo-call-center.git#main
-    default_image: yonishelach/call-center-transformers
-    gpus: 1
-kind: project
+  source: git://github.com/mlrun/demo-call-center.git#main
+  origin_url: git://github.com/GiladShapira94/demo-call-center.git#refs/heads/main
+  load_source_on_run: true
 status:
   state: online
+kind: project
 metadata:
-  created: '2024-09-23T10:31:40.952000'
-  name: call-center-demo-shapira
+  created: '2024-10-14T15:50:14.580000'
+  name: call-center-demo-skip-shapira
