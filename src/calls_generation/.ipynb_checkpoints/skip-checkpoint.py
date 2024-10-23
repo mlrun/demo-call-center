@@ -64,10 +64,11 @@ def skip_and_import_local_data(language:str ):
     print("- agents and clients inserted")
 
     #log zip files
-    # conversations_art = project.log_artifact(item="conversation-generation_conversations",
-    #                                          spec=zip_spec,local_path=str(example_data_dir / f"{language}_conversations.zip"),db_key="conversation-generation_conversations")
-    # audio_files_art = project.log_artifact(item="text-to-audio_audio_files",
-    #                                        spec=zip_spec,local_path=str(example_data_dir / f"{language}_audio_files.zip"),db_key="text-to-audio_audio_files") 
+    remote_zip_path = mlrun.get_sample_path(f'call-demo/{language}_audio_files.zip')
+    conversations_art = project.log_artifact(item="conversation-generation_conversations",
+                                             spec=zip_spec,local_path=str(example_data_dir / f"{language}_conversations.zip"),db_key="conversation-generation_conversations")
+    audio_files_art = project.log_artifact(item="text-to-audio_audio_files",
+                                           spec=zip_spec,target_path=remote_zip_path,db_key="text-to-audio_audio_files") 
     #log parquet files
     calls_batch_df = pd.read_parquet(str(example_data_dir / f"{language}_calls_batch.parquet"))
     dataframe_df = pd.read_parquet(str(example_data_dir / f"{language}_dataframe.parquet"))

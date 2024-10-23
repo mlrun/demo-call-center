@@ -7,8 +7,8 @@ def postprocess_answers(answers: pd.DataFrame):
             lambda x: "yes" in x.casefold()
         )
     for column in ["client_tone", "agent_tone"]:
-        df[column] = df[column].apply(lambda x: "Positive" if "Positive" in x else x)
-        df[column] = df[column].apply(lambda x: "Negative" if "Negative" in x else x)
-        df[column] = df[column].apply(lambda x: "Neutral" if "Neutral" in x else x)
+        answers[column] = answers[column].apply(lambda x: "Positive" if "Positive" in x else x)
+        answers[column] = answers[column].apply(lambda x: "Negative" if "Negative" in x else x)
+        answers[column] = answers[column].apply(lambda x: "Neutral" if "Neutral" in x else x)
     return answers
 
