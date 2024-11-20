@@ -127,17 +127,19 @@ def _set_function(
         kind: str,
         gpus: int = 0,
         node_name: str = None,
+        with_repo: bool = None,
         image: str = None,
 ):
     # Set the given function:
-    with_repo = not func.startswith("hub://")
+    if with_repo is None:
+        with_repo =  not func.startswith("hub://")
     mlrun_function = project.set_function(
         func=func, name=name, kind=kind, with_repo=with_repo, image=image,
     )
 
     # Configure GPUs according to the given kind:
     if gpus >= 1:
-        mlrun_function.with_node_selection(node_selector={"app.iguazio.com/node-group": "added-t4"})
+        mlrun_function.with_node_selection(node_selector={"alpha.eksctl.io/nodegroup-name": "added-t4"})
         if kind == "mpijob":
             # 1 GPU for each rank:
             mlrun_function.with_limits(gpus=1)
@@ -243,6 +245,7 @@ def _set_calls_analysis_functions(
         project=project,
         func="./src/calls_analysis/postprocessing.py",
         name="postprocessing",
+        with_repo=False,
         kind="job",
         node_name=node_name,
     )

@@ -1,0 +1,72 @@
+[
+    {
+        "first_name": "Emily",
+        "last_name": "Smith",
+        "phone_number": "123-456-7890",
+        "email": "emilysmith@example.com",
+        "client_id": "12345"
+    },
+    {
+        "first_name": "John",
+        "last_name": "Doe",
+        "phone_number": "098-765-4321",
+        "email": "johndoe@example.com",
+        "client_id": "67890"
+    },
+    {
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "phone_number": "456-789-0123",
+        "email": "janedoe@example.com",
+        "client_id": "23456"
+    },
+    {
+        "first_name": "Robert",
+        "last_name": "Johnson",
+        "phone_number": "789-012-3456",
+        "email": "robertjohnson@example.com",
+        "client_id": "78901"
+    },
+    {
+        "first_name": "Mary",
+        "last_name": "Davis",
+        "phone_number": "012-345-6789",
+        "email": "marydavis@example.com",
+        "client_id": "34567"
+    },
+    {
+        "first_name": "James",
+        "last_name": "Miller",
+        "phone_number": "987-654-3210",
+        "email": "jamesmiller@example.com",
+        "client_id": "89012"
+    },
+    {
+        "first_name": "Patricia",
+        "last_name": "Wilson",
+        "phone_number": "654-321-0987",
+        "email": "patriciawilson@example.com",
+        "client_id": "45678"
+    },
+    {
+        "first_name": "Michael",
+        "last_name": "Moore",
+        "phone_number": "321-098-7654",
+        "email": "michaelmoore@example.com",
+        "client_id": "90123"
+    },
+    {
+        "first_name": "Elizabeth",
+        "last_name": "Taylor",
+        "phone_number": "234-567-8901",
+        "email": "elizabethtaylor@example.com",
+        "client_id": "56789"
+    },
+    {
+        "first_name": "David",
+        "last_name": "Anderson",
+        "phone_number": "567-890-1234",
+        "email": "davidanderson@example.com",
+        "client_id": "23459"
+    }
+]
