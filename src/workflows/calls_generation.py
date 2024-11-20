@@ -56,7 +56,7 @@ def pipeline(
                     f"last_name: in {language}, no special characters",
                     "phone_number",
                     "email",
-                    "client_id",
+                    "client_id: no leading zeros",
                 ],
             },
             returns=["clients: file"],
@@ -88,7 +88,7 @@ def pipeline(
                 "fields": [
                     f"first_name: in {language}, no special characters",
                     f"last_name: in {language}, no special characters",
-                    "agent_id",
+                    "agent_id: no leading zeros",
                 ],
             },
             returns=["agents: file"],
