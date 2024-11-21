@@ -37,21 +37,25 @@ def setup(
 
     # Unpack parameters:
     source = project.get_param(key="source")
-    default_image = project.get_param(key="default_image")
+    default_image = project.get_param(key="default_image", default=None)
+    build_image = project.get_param(key="build_image", default=False)
     gpus = project.get_param(key="gpus", default=0)
     node_name = project.get_param(key="node_name", default=None)
+    node_selector = project.get_param(key="node_selector", default={"alpha.eksctl.io/nodegroup-name": "added-t4"})
 
     # Set the project git source:
     if source:
         print(f"Project Source: {source}")
         project.set_source(source=source, pull_at_runtime=True)
 
-    # Set or build the default image:
-    if default_image is None:
+    # Set default image:
+    if default_image:
+        project.set_default_image(default_image)
+
+    # Build the image:
+    if build_image:
         print("Building default image for the demo:")
         _build_image(project=project)
-    else:
-        project.set_default_image(default_image)
 
     # Set the secrets:
     _set_secrets(
@@ -65,8 +69,8 @@ def setup(
     mlrun.get_run_db().get_hub_catalog(source_name="default", force_refresh=True)
 
     # Set the functions:
-    _set_calls_generation_functions(project=project, gpus=gpus, node_name=node_name)
-    _set_calls_analysis_functions(project=project, gpus=gpus, node_name=node_name)
+    _set_calls_generation_functions(project=project, gpus=gpus, node_name=node_name, node_selector=node_selector)
+    _set_calls_analysis_functions(project=project, gpus=gpus, node_name=node_name, node_selector=node_selector)
 
     # Set the workflows:
     _set_workflows(project=project)
@@ -84,21 +88,19 @@ def _build_image(project: mlrun.projects.MlrunProject):
         base_image="mlrun/mlrun-gpu",
         commands=[
             # Update apt-get to install ffmpeg (support audio file formats):
-            "apt-get update -y",
-            "apt-get install ffmpeg -y",
+            "apt-get update -y && apt-get install ffmpeg -y",
             # Install demo requirements:
-            "pip install tqdm mpi4py",
-            "pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118",
-            "pip install pyannote.audio faster-whisper bitsandbytes transformers accelerate datasets peft optimum",
-            "pip install auto-gptq --extra-index-url https://huggingface.github.io/autogptq-index/whl/cu118/",
-            "pip install langchain openai",
+            "pip install transformers==4.44.1",
+            "pip install torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 --index-url https://download.pytorch.org/whl/cu118",
+            "pip install bitsandbytes==0.41.1 accelerate==0.24.1 datasets==2.14.6 peft==0.5.0 optimum==1.13.2",
+            "pip install auto-gptq==0.4.2 --extra-index-url https://huggingface.github.io/autogptq-index/whl/cu118/",
+            "pip install langchain==0.0.327 openai==0.28.1",
             "pip install git+https://github.com/suno-ai/bark.git",  # suno-bark
-            "pip install streamlit st-annotated-text spacy librosa presidio-anonymizer presidio-analyzer nltk flair",
-            "pip install -U SQLAlchemy",
-            "pip uninstall -y onnxruntime-gpu",
-            "pip uninstall -y onnxruntime",
-            "pip install onnxruntime-gpu",
+            "pip install streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.2 librosa==0.10.1 presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0",
             "python -m spacy download en_core_web_lg",
+            "pip install -U SQLAlchemy",
+            "pip uninstall -y onnxruntime-gpu onnxruntime",
+            "pip install onnxruntime-gpu",
         ],
         set_as_default=True,
     )
@@ -129,6 +131,7 @@ def _set_function(
         node_name: str = None,
         with_repo: bool = None,
         image: str = None,
+        node_selector: dict = None,
 ):
     # Set the given function:
     if with_repo is None:
@@ -139,7 +142,7 @@ def _set_function(
 
     # Configure GPUs according to the given kind:
     if gpus >= 1:
-        mlrun_function.with_node_selection(node_selector={"alpha.eksctl.io/nodegroup-name": "added-t4"})
+        mlrun_function.with_node_selection(node_selector=node_selector)
         if kind == "mpijob":
             # 1 GPU for each rank:
             mlrun_function.with_limits(gpus=1)
@@ -157,7 +160,8 @@ def _set_function(
 def _set_calls_generation_functions(
     project: mlrun.projects.MlrunProject,
     gpus: int,
-    node_name: str = None
+    node_name: str = None,
+    node_selector: dict = None,
 ):
     # Client and agent data generator
     _set_function(
@@ -184,13 +188,15 @@ def _set_calls_generation_functions(
         name="text-to-audio-generator",
         kind="job",  # TODO: MPI once MLRun supports it out of the box
         gpus=gpus,
+        node_selector=node_selector,
     )
 
 
 def _set_calls_analysis_functions(
     project: mlrun.projects.MlrunProject,
     gpus: int,
-    node_name: str = None
+    node_name: str = None,
+    node_selector: dict = None,
 ):
     # DB management:
     _set_function(
@@ -218,6 +224,7 @@ def _set_calls_analysis_functions(
         kind="mpijob" if gpus > 1 else "job",
         gpus=gpus,
         node_name=node_name,
+        node_selector=node_selector,
     )
 
     # PII recognition:
@@ -227,7 +234,6 @@ def _set_calls_analysis_functions(
         name="pii-recognition",
         kind="job",
         node_name=node_name,
-        image="guyliguazio/call-center-11.8:1.4.1.6",
     )
 
     # Question answering:
@@ -238,6 +244,7 @@ def _set_calls_analysis_functions(
         kind="job",
         gpus=gpus,
         node_name=node_name,
+        node_selector=node_selector,
     )
 
     # Postprocessing:
