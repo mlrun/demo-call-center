@@ -234,7 +234,6 @@ def _set_calls_analysis_functions(
         name="pii-recognition",
         kind="job",
         node_name=node_name,
-        image="guyliguazio/call-center-11.8:1.4.1.6",
     )
 
     # Question answering:
