@@ -170,7 +170,6 @@ def _set_calls_generation_functions(
         name="structured-data-generator",
         kind="job",
         node_name=node_name,
-        node_selector=node_selector,
     )
 
     # Conversation generator:
@@ -180,7 +179,6 @@ def _set_calls_generation_functions(
         name="conversations-generator",
         kind="job",
         node_name=node_name,
-        node_selector=node_selector,
     )
 
     # Text to audio generator:
@@ -207,7 +205,6 @@ def _set_calls_analysis_functions(
         name="db-management",
         kind="job",
         node_name=node_name,
-        node_selector=node_selector,
     )
 
     # Speech diarization:
@@ -217,7 +214,6 @@ def _set_calls_analysis_functions(
         name="silero-vad",
         kind="job",
         node_name=node_name,
-        node_selector=node_selector,
     )
 
     # Transcription:
@@ -239,7 +235,6 @@ def _set_calls_analysis_functions(
         kind="job",
         node_name=node_name,
         image="guyliguazio/call-center-11.8:1.4.1.6",
-        node_selector=node_selector,
     )
 
     # Question answering:
@@ -261,7 +256,6 @@ def _set_calls_analysis_functions(
         with_repo=False,
         kind="job",
         node_name=node_name,
-        node_selector=node_selector,
     )
 
 
