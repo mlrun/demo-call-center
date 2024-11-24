@@ -11,7 +11,7 @@ By the end of this demo you will see the potential power of LLMs for feature ext
 This demo uses:
 * [**OpenAI's Whisper**](https://openai.com/research/whisper) &mdash; To transcribe the audio calls into text.
 * [**Flair**](https://flairnlp.github.io/) and [**Microsoft's Presidio**](https://microsoft.github.io/presidio/) - To recognize PII so it can be filtered out.
-* [**HuggingFace**](https://huggingface.co/) &mdash; The main machine-learning framework to get the model and tokenizer for the features extraction. The demo uses [tiiuae/falcon-40b-instruct](https://huggingface.co/tiiuae/falcon-40b-instruct) as the LLM to answer questions.
+* [**HuggingFace**](https://huggingface.co/) &mdash; The main machine-learning framework to get the model and tokenizer for the features extraction. 
 * and [**MLRun**](https://www.mlrun.org/) &mdash; as the orchestrator to operationalize the workflow.
 
 The demo contains a single [notebook](./notebook.ipynb) that encompasses the entire demo.
