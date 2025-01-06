@@ -23,7 +23,8 @@ from mlrun.artifacts import ArtifactSpec, DatasetArtifact
 import mlrun
 import pandas as pd
 
-def skip_and_import_local_data(language:str ):
+
+def skip_and_import_local_data(language: str):
     """
     This function logs example data to the database and to the project.
     Call this function from the notebook in order to skip the calls generation workflow.
@@ -40,22 +41,47 @@ def skip_and_import_local_data(language:str ):
     Agent.__table__.drop(engine)
     create_tables()
     print("- Initialized tables")
-    
-    #log agents and clients data 
-    
-    json_spec = ArtifactSpec(unpackaging_instructions={"packager_name": "ListPackager",
-                                                       "object_type": "builtins.list","artifact_type": "file","instructions":{"file_format": "json"}})
-    zip_spec = ArtifactSpec(unpackaging_instructions={"packager_name": "StrPackager",
-                                                      "object_type": "builtins.str","artifact_type": "path","instructions":{"archive_format": "zip","is_directory": "true"}})
-    parquet_spec = ArtifactSpec(unpackaging_instructions={"packager_name": "PandasDataFramePackager","object_type": 
-                                                          "pandas.core.frame.DataFrame","artifact_type": "dataset","instructions": {}})
+
+    # log agents and clients data
+    json_spec = ArtifactSpec(
+        unpackaging_instructions={
+            "packager_name": "ListPackager",
+            "object_type": "builtins.list",
+            "artifact_type": "file",
+            "instructions": {"file_format": "json"},
+        }
+    )
+    zip_spec = ArtifactSpec(
+        unpackaging_instructions={
+            "packager_name": "StrPackager",
+            "object_type": "builtins.str",
+            "artifact_type": "path",
+            "instructions": {"archive_format": "zip", "is_directory": "true"},
+        }
+    )
+    parquet_spec = ArtifactSpec(
+        unpackaging_instructions={
+            "packager_name": "PandasDataFramePackager",
+            "object_type": "pandas.core.frame.DataFrame",
+            "artifact_type": "dataset",
+            "instructions": {},
+        }
+    )
     # load agent and client data:
-    agents = project.log_artifact(item="agent-data-generator_agents",spec=json_spec,
-                                  local_path=str(example_data_dir / f"{language}_agents.json"),db_key="agent-data-generator_agents")
+    agents = project.log_artifact(
+        item="agent-data-generator_agents",
+        spec=json_spec,
+        local_path=str(example_data_dir / f"{language}_agents.json"),
+        db_key="agent-data-generator_agents",
+    )
     agents = agents.to_dataitem()
     agents = yaml.load(agents.get(), Loader=yaml.FullLoader)
-    clients = project.log_artifact(item="client-data-generator_clients",spec=json_spec,
-                                   local_path=str(example_data_dir / f"{language}_clients.json"),db_key="client-data-generator_clients")
+    clients = project.log_artifact(
+        item="client-data-generator_clients",
+        spec=json_spec,
+        local_path=str(example_data_dir / f"{language}_clients.json"),
+        db_key="client-data-generator_clients",
+    )
     clients = clients.to_dataitem()
     clients = yaml.load(clients.get(), Loader=yaml.FullLoader)
 
@@ -63,23 +89,53 @@ def skip_and_import_local_data(language:str ):
     _insert_agents_and_clients_to_db(agents, clients)
     print("- agents and clients inserted")
 
-    #log zip files
-    remote_zip_path = mlrun.get_sample_path(f'call-demo/{language}_audio_files.zip')
-    conversations_art = project.log_artifact(item="conversation-generation_conversations",
-                                             spec=zip_spec,local_path=str(example_data_dir / f"{language}_conversations.zip"),db_key="conversation-generation_conversations")
-    audio_files_art = project.log_artifact(item="text-to-audio_audio_files",
-                                           spec=zip_spec,target_path=remote_zip_path,db_key="text-to-audio_audio_files") 
-    #log parquet files
-    calls_batch_df = pd.read_parquet(str(example_data_dir / f"{language}_calls_batch.parquet"))
-    dataframe_df = pd.read_parquet(str(example_data_dir / f"{language}_dataframe.parquet"))
-    ground_truths_df = pd.read_parquet(str(example_data_dir / f"{language}_ground_truths.parquet"))
-    metadata_df = pd.read_parquet(str(example_data_dir / f"{language}_metadata.parquet"))
-                                
-    project.log_artifact(item=DatasetArtifact(key="batch-creation_calls_batch",df=calls_batch_df),
-                         spec=parquet_spec,local_path=str(example_data_dir / f"{language}_calls_batch.parquet"))
-    project.log_artifact(item=DatasetArtifact(key="text-to-audio_dataframe",df=dataframe_df),spec=parquet_spec)
-    project.log_artifact(item=DatasetArtifact(key="conversation-generation_ground_truths",df=ground_truths_df),spec=parquet_spec)
-    project.log_artifact(item=DatasetArtifact(key="conversation-generation_metadata",df=metadata_df),spec=parquet_spec)
+    # log zip files
+    remote_zip_path = mlrun.get_sample_path(f"call-demo/{language}_audio_files.zip")
+    conversations_art = project.log_artifact(
+        item="conversation-generation_conversations",
+        spec=zip_spec,
+        local_path=str(example_data_dir / f"{language}_conversations.zip"),
+        db_key="conversation-generation_conversations",
+    )
+    audio_files_art = project.log_artifact(
+        item="text-to-audio_audio_files",
+        spec=zip_spec,
+        target_path=remote_zip_path,
+        db_key="text-to-audio_audio_files",
+    )
+    # log parquet files
+    calls_batch_df = pd.read_parquet(
+        str(example_data_dir / f"{language}_calls_batch.parquet")
+    )
+    dataframe_df = pd.read_parquet(
+        str(example_data_dir / f"{language}_dataframe.parquet")
+    )
+    ground_truths_df = pd.read_parquet(
+        str(example_data_dir / f"{language}_ground_truths.parquet")
+    )
+    metadata_df = pd.read_parquet(
+        str(example_data_dir / f"{language}_metadata.parquet")
+    )
+
+    project.log_artifact(
+        item=DatasetArtifact(key="batch-creation_calls_batch", df=calls_batch_df),
+        spec=parquet_spec,
+        local_path=str(example_data_dir / f"{language}_calls_batch.parquet"),
+    )
+    project.log_artifact(
+        item=DatasetArtifact(key="text-to-audio_dataframe", df=dataframe_df),
+        spec=parquet_spec,
+    )
+    project.log_artifact(
+        item=DatasetArtifact(
+            key="conversation-generation_ground_truths", df=ground_truths_df
+        ),
+        spec=parquet_spec,
+    )
+    project.log_artifact(
+        item=DatasetArtifact(key="conversation-generation_metadata", df=metadata_df),
+        spec=parquet_spec,
+    )
     print("*** first workflow skipped successfully ***")
 
 
@@ -96,9 +152,7 @@ def _insert_agents_and_clients_to_db(agents: list, clients: list):
         sess.execute(insert(Client), clients)
 
 
-
-
-#TODO: change to export the actual data and not the artifacts
+# TODO: change to export the actual data and not the artifacts
 def save_current_example_data():
     project = mlrun.get_current_project()
     export_dir = Path("example_data")
@@ -108,9 +162,15 @@ def save_current_example_data():
     for artifact_name, target_path in [
         ("client-data-generator_clients", "clients.zip"),
         ("agent-data-generator_agents", "agents.zip"),
-        ("conversation-generation_conversations", "conversation_generation/conversations.zip"),
+        (
+            "conversation-generation_conversations",
+            "conversation_generation/conversations.zip",
+        ),
         ("conversation-generation_metadata", "conversation_generation/metadata.zip"),
-        ("conversation-generation_ground_truths", "conversation_generation/ground_truths.zip"),
+        (
+            "conversation-generation_ground_truths",
+            "conversation_generation/ground_truths.zip",
+        ),
         ("text-to-audio_audio_files", "text_to_audio/audio_files.zip"),
         ("text-to-audio_dataframe", "text_to_audio/dataframe.zip"),
         ("batch-creation_calls_batch", "batch_creation/calls_batch.zip"),
