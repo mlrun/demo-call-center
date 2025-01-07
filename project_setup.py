@@ -109,8 +109,7 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool):
 
     other_requirements = [
         "pip install langchain==0.3.13 openai==1.58.1 langchain_community==0.3.13 pydub==0.25.1",
-        "pip install streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.2 librosa==0.10.1 ",
-        "presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0",
+        "pip install streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.2 librosa==0.10.1 presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0",
         "python -m spacy download en_core_web_lg",
         "pip install -U SQLAlchemy",
         "pip uninstall -y onnxruntime-gpu onnxruntime",
