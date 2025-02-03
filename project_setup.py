@@ -41,7 +41,7 @@ def setup(
     build_image = project.get_param(key="build_image", default=False)
     gpus = project.get_param(key="gpus", default=0)
     node_name = project.get_param(key="node_name", default=None)
-    node_selector = project.get_param(key="node_selector", default={"alpha.eksctl.io/nodegroup-name": "added-t4"})
+    node_selector = project.get_param(key="node_selector", default=None)
 
     # Set the project git source:
     if source:
@@ -108,8 +108,7 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool):
     ] if with_gpu else []
 
     other_requirements = [
-        "pip install langchain==0.3.13 openai==1.58.1 langchain_community==0.3.13 pydub==0.25.1",
-        "pip install streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.2 librosa==0.10.1 presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0",
+        "pip install mlrun langchain==0.2.17 openai==1.58.1 langchain_community==0.2.19 pydub==0.25.1 streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.2 librosa==0.10.1 presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0 htbuilder==0.6.2",
         "python -m spacy download en_core_web_lg",
         "pip install -U SQLAlchemy",
         "pip uninstall -y onnxruntime-gpu onnxruntime",
@@ -168,7 +167,8 @@ def _set_function(
 
     # Configure GPUs according to the given kind:
     if gpus >= 1:
-        mlrun_function.with_node_selection(node_selector=node_selector)
+        if node_selector:
+            mlrun_function.with_node_selection(node_selector=node_selector)
         if kind == "mpijob":
             # 1 GPU for each rank:
             mlrun_function.with_limits(gpus=1)
