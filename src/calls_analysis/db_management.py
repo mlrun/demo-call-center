@@ -176,8 +176,7 @@ class Call(Base):
     agent: Mapped["Agent"] = relationship(back_populates="calls", lazy=True)
 
 
-def _create_engine():
-    bucket_name = os.environ[ProjectSecrets.S3_BUCKET_NAME]
+def _create_engine(bucket_name: str = None):
     if bucket_name:
         with tempfile.NamedTemporaryFile(suffix='.sqlite') as tmp:
             s3 = boto3.client('s3')
@@ -206,7 +205,7 @@ def create_tables():
 
 def insert_clients(context: mlrun.MLClientCtx, clients: list):
     # Create an engine:
-    engine = _create_engine()
+    engine = _create_engine(context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME))
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -219,7 +218,7 @@ def insert_clients(context: mlrun.MLClientCtx, clients: list):
 
 def insert_agents(context: mlrun.MLClientCtx, agents: list):
     # Create an engine:
-    engine = _create_engine()
+    engine = _create_engine(context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME))
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -234,7 +233,7 @@ def insert_calls(
         context: mlrun.MLClientCtx, calls: pd.DataFrame
 ) -> Tuple[pd.DataFrame, List[str]]:
     # Create an engine:
-    engine = _create_engine()
+    engine = _create_engine(context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME))
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -261,7 +260,7 @@ def update_calls(
         data: pd.DataFrame,
 ):
     # Create an engine:
-    engine = _create_engine()
+    engine = _create_engine(context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME))
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -286,8 +285,9 @@ def update_calls(
     _update_db(engine)
 
 def get_calls() -> pd.DataFrame:
+    context = mlrun.get_or_create_ctx("get_calls")
     # Create an engine:
-    engine = _create_engine()
+    engine = _create_engine(context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME))
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -301,7 +301,7 @@ def get_calls() -> pd.DataFrame:
 
 def get_agents(context: mlrun.MLClientCtx) -> list:
     # Create an engine:
-    engine = _create_engine()
+    engine = _create_engine(context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME))
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -314,7 +314,7 @@ def get_agents(context: mlrun.MLClientCtx) -> list:
 
 def get_clients(context: mlrun.MLClientCtx) -> list:
     # Create an engine:
-    engine = _create_engine()
+    engine = _create_engine(context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME))
 
     # Initialize a session maker:
     session = sessionmaker(engine)
