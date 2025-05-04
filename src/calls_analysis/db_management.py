@@ -13,16 +13,17 @@
 # limitations under the License.
 import datetime
 import os
+import tempfile
 from typing import List, Optional, Tuple
 
+import boto3
 import mlrun
 import pandas as pd
 from sqlalchemy import (
-    ForeignKey,
     Boolean,
     Date,
     Enum,
-    Float,
+    ForeignKey,
     Integer,
     String,
     Time,
@@ -33,10 +34,10 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.orm import (
-    relationship,
     Mapped,
     declarative_base,
     mapped_column,
+    relationship,
     sessionmaker,
 )
 
@@ -175,20 +176,37 @@ class Call(Base):
     agent: Mapped["Agent"] = relationship(back_populates="calls", lazy=True)
 
 
+def _create_engine():
+    bucket_name = os.environ[ProjectSecrets.S3_BUCKET_NAME]
+    if bucket_name:
+        with tempfile.NamedTemporaryFile(suffix='.sqlite') as tmp:
+            s3 = boto3.client('s3')
+            s3.download_file(bucket_name, "sqlite.db", tmp.name)
+            return create_engine(f"sqlite:///{tmp.name}")
+    else:
+        return create_engine(url=os.environ[ProjectSecrets.MYSQL_URL])
+
+def _update_db(engine):
+    bucket_name = os.environ[ProjectSecrets.S3_BUCKET_NAME]
+    if bucket_name:
+        s3 = boto3.client('s3')
+        s3.upload_file(engine.url.database, bucket_name, "sqlite.db")
+
 def create_tables():
     """
     Create the call center schema tables for when creating or loading the MLRun project.
     """
     # Create an engine:
-    engine = create_engine(url=os.environ[ProjectSecrets.MYSQL_URL])
+    engine = _create_engine()
 
     # Create the schema's tables:
     Base.metadata.create_all(engine)
 
+    _update_db(engine)
 
 def insert_clients(context: mlrun.MLClientCtx, clients: list):
     # Create an engine:
-    engine = create_engine(url=context.get_secret(key=ProjectSecrets.MYSQL_URL))
+    engine = _create_engine()
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -197,10 +215,11 @@ def insert_clients(context: mlrun.MLClientCtx, clients: list):
     with session.begin() as sess:
         sess.execute(insert(Client), clients)
 
+    _update_db(engine)
 
 def insert_agents(context: mlrun.MLClientCtx, agents: list):
     # Create an engine:
-    engine = create_engine(url=context.get_secret(key=ProjectSecrets.MYSQL_URL))
+    engine = _create_engine()
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -209,12 +228,13 @@ def insert_agents(context: mlrun.MLClientCtx, agents: list):
     with session.begin() as sess:
         sess.execute(insert(Agent), agents)
 
+    _update_db(engine)
 
 def insert_calls(
-    context: mlrun.MLClientCtx, calls: pd.DataFrame
+        context: mlrun.MLClientCtx, calls: pd.DataFrame
 ) -> Tuple[pd.DataFrame, List[str]]:
     # Create an engine:
-    engine = create_engine(url=context.get_secret(key=ProjectSecrets.MYSQL_URL))
+    engine = _create_engine()
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -226,20 +246,22 @@ def insert_calls(
     with session.begin() as sess:
         sess.execute(insert(Call), records)
 
+    _update_db(engine)
+
     # Return the metadata and audio files:
     audio_files = list(calls["audio_file"])
     return calls, audio_files
 
 
 def update_calls(
-    context: mlrun.MLClientCtx,
-    status: str,
-    table_key: str,
-    data_key: str,
-    data: pd.DataFrame,
+        context: mlrun.MLClientCtx,
+        status: str,
+        table_key: str,
+        data_key: str,
+        data: pd.DataFrame,
 ):
     # Create an engine:
-    engine = create_engine(url=context.get_secret(key=ProjectSecrets.MYSQL_URL))
+    engine = _create_engine()
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -261,10 +283,11 @@ def update_calls(
             update(Call).where(getattr(Call, table_key) == bindparam(data_key)), data
         )
 
+    _update_db(engine)
 
 def get_calls() -> pd.DataFrame:
     # Create an engine:
-    engine = create_engine(url=os.environ[ProjectSecrets.MYSQL_URL])
+    engine = _create_engine()
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -278,7 +301,7 @@ def get_calls() -> pd.DataFrame:
 
 def get_agents(context: mlrun.MLClientCtx) -> list:
     # Create an engine:
-    engine = create_engine(url=context.get_secret(key=ProjectSecrets.MYSQL_URL))
+    engine = _create_engine()
 
     # Initialize a session maker:
     session = sessionmaker(engine)
@@ -291,7 +314,7 @@ def get_agents(context: mlrun.MLClientCtx) -> list:
 
 def get_clients(context: mlrun.MLClientCtx) -> list:
     # Create an engine:
-    engine = create_engine(url=context.get_secret(key=ProjectSecrets.MYSQL_URL))
+    engine = _create_engine()
 
     # Initialize a session maker:
     session = sessionmaker(engine)

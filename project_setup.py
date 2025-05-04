@@ -33,7 +33,8 @@ def setup(
     # Unpack secrets from environment variables:
     openai_key = os.environ[ProjectSecrets.OPENAI_API_KEY]
     openai_base = os.environ[ProjectSecrets.OPENAI_API_BASE]
-    mysql_url = os.environ[ProjectSecrets.MYSQL_URL]
+    mysql_url = os.environ.get(ProjectSecrets.MYSQL_URL, "")
+    bucket_name = os.environ.get(ProjectSecrets.S3_BUCKET_NAME)
 
     # Unpack parameters:
     source = project.get_param(key="source")
@@ -63,6 +64,7 @@ def setup(
         openai_key=openai_key,
         openai_base=openai_base,
         mysql_url=mysql_url,
+        bucket_name=bucket_name,
     )
 
     # Refresh MLRun hub to the most up-to-date version:
@@ -136,6 +138,7 @@ def _set_secrets(
     openai_key: str,
     openai_base: str,
     mysql_url: str,
+    bucket_name: str = None,
 ):
     # Must have secrets:
     project.set_secrets(
@@ -145,6 +148,12 @@ def _set_secrets(
             ProjectSecrets.MYSQL_URL: mysql_url,
         }
     )
+    if bucket_name:
+        project.set_secrets(
+            secrets={
+                ProjectSecrets.S3_BUCKET_NAME: bucket_name,
+            }
+        )
 
 
 def _set_function(

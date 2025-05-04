@@ -19,6 +19,7 @@ class ProjectSecrets:
     OPENAI_API_BASE = "OPENAI_API_BASE"
     MYSQL_URL = "MYSQL_URL"
     MYSQL_CONNECT_ARGS = "MYSQL_CONNECT_ARGS"
+    S3_BUCKET_NAME = "S3_BUCKET_NAME"
 
 
 class CallStatus(enum.Enum):
