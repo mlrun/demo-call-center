@@ -179,6 +179,7 @@ class Call(Base):
 class DBEngine:
     def __init__(self, context: mlrun.MLClientCtx):
         self.bucket_name = context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME)
+        self.temp_file = None
         self.engine = self._create_engine()
 
     def get_session(self):
@@ -187,16 +188,32 @@ class DBEngine:
     def update_db(self):
         if self.bucket_name:
             s3 = boto3.client('s3')
-            s3.upload_file(self.engine.url.database, self.bucket_name, "sqlite.db")
+            s3.upload_file(self.temp_file.name, self.bucket_name, "sqlite.db")
 
     def _create_engine(self):
         if self.bucket_name:
-            with tempfile.NamedTemporaryFile(suffix='.sqlite') as tmp:
-                s3 = boto3.client('s3')
-                s3.download_file(self.bucket_name, "sqlite.db", tmp.name)
-                return create_engine(f"sqlite:///{tmp.name}")
+            # Create a temporary file that will persist throughout the object's lifetime
+            self.temp_file = tempfile.NamedTemporaryFile(suffix='.sqlite', delete=False)
+            self.temp_file.close()  # Close the file but keep the name
+
+            s3 = boto3.client('s3')
+            try:
+                s3.download_file(self.bucket_name, "sqlite.db", self.temp_file.name)
+            except Exception as e:
+                # Handle case where file might not exist in S3 yet
+                print(f"Warning: Could not download database from S3: {e}")
+
+            return create_engine(f"sqlite:///{self.temp_file.name}")
         else:
             return create_engine(url=os.environ[ProjectSecrets.MYSQL_URL])
+
+    def __del__(self):
+        # Clean up the temporary file when the object is destroyed
+        if self.temp_file:
+            try:
+                os.unlink(self.temp_file.name)
+            except:
+                pass
 
 def create_tables():
     """
