@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import yaml
 from pathlib import Path
 
-from sqlalchemy import create_engine, insert
-from sqlalchemy.orm import sessionmaker
-from src.calls_analysis.db_management import Agent, Client, Call, create_tables
-from src.common import ProjectSecrets
-from mlrun.artifacts import ArtifactSpec, DatasetArtifact
 import mlrun
 import pandas as pd
+import yaml
+from mlrun.artifacts import ArtifactSpec, DatasetArtifact
+from sqlalchemy import create_engine, insert
+from sqlalchemy.orm import sessionmaker
+
+from src.calls_analysis.db_management import Agent, Call, Client, create_tables
+from src.common import ProjectSecrets
 
 
 def skip_and_import_local_data(language: str):

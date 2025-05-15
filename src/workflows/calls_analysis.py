@@ -16,8 +16,8 @@ from typing import List
 import kfp
 import mlrun
 from kfp import dsl
-from src.common import TONES, TOPICS, CallStatus
 
+from src.common import TONES, TOPICS, CallStatus
 
 QUESTIONS = [
     [
@@ -36,7 +36,7 @@ QUESTIONS = [
         "6. Rate the agent's level of effective communication (The ability to convey information clearly and concisely) on a scale of 1-5.",
         "7. Rate the agent's level of active listening (The process of paying attention to and understanding what someone is saying) on a scale of 1-5.",
         "8. Rate the agent's level of customization (The process of tailoring something to the specific needs or preferences of an individual) on a scale of 1-5.",
-    ]
+    ],
 ]
 DEMO_CALL = (
     "Agent: Good afternoon, you've reached [Internet Service Provider] customer support. I'm Megan. How can I assist "
@@ -58,36 +58,32 @@ DEMO_CALL = (
     "Customer: You too! Goodbye, Megan.\n"
     "Agent: Goodbye, Lisa!"
 )
-DEMO_ANSWERS = [(
-    "1. billing discrepancies\n"
-    "2. The customer, contacted the call center regarding billing discrepancies on her statement. The agent, "
-    "acknowledged the issue, assured The customer it would be resolved, and escalated it to the billing department for "
-    "correction.\n"
-    "3. Yes.\n"
-    "4. Natural.\n"
-    "5. positive.\n"),
-
+DEMO_ANSWERS = [
     (
-    "1. No\n"
-    "2. No\n"
-    "3. 4\n"
-    "4. 5\n"
-    "5. 4\n"
-    "6. 5\n"
-    "7. 4\n"
-    "8. 3"
-)]
-TEXT_WRAPPER = [(
-    f"<|im_start|>system: You are an AI assistant that answers questions accurately and shortly<|im_end|>\n"
-    f"<|im_start|>user: Given the following text:\n"
-    f"{DEMO_CALL}\n"
-    f"answer the questions as accurately as you can:\n"
-    f"{QUESTIONS[i]}<|im_end|>\n"
-    f"<|im_start|>assistant:\n"
-    f"{DEMO_ANSWERS[i]}<|im_end|>\n"
-    f"<|im_start|>user: Given the following text:\n"
-    "{}"
-) for i in range(len(QUESTIONS))]
+        "1. billing discrepancies\n"
+        "2. The customer, contacted the call center regarding billing discrepancies on her statement. The agent, "
+        "acknowledged the issue, assured The customer it would be resolved, and escalated it to the billing department for "
+        "correction.\n"
+        "3. Yes.\n"
+        "4. Natural.\n"
+        "5. positive.\n"
+    ),
+    ("1. No\n" "2. No\n" "3. 4\n" "4. 5\n" "5. 4\n" "6. 5\n" "7. 4\n" "8. 3"),
+]
+TEXT_WRAPPER = [
+    (
+        f"<|im_start|>system: You are an AI assistant that answers questions accurately and shortly<|im_end|>\n"
+        f"<|im_start|>user: Given the following text:\n"
+        f"{DEMO_CALL}\n"
+        f"answer the questions as accurately as you can:\n"
+        f"{QUESTIONS[i]}<|im_end|>\n"
+        f"<|im_start|>assistant:\n"
+        f"{DEMO_ANSWERS[i]}<|im_end|>\n"
+        f"<|im_start|>user: Given the following text:\n"
+        "{}"
+    )
+    for i in range(len(QUESTIONS))
+]
 QUESTIONS_WRAPPER = (
     " answer the given questions as accurately as you can, do not write more answers the questions:\n"
     "{}<|im_end|>\n"
@@ -106,7 +102,7 @@ def pipeline(
     pii_recognition_entity_operator_map: List[str],
     question_answering_model: str,
     batch_size: int = 2,
-    auto_gptq_exllama_max_input_length:int = None,
+    auto_gptq_exllama_max_input_length: int = None,
     insert_calls_db: bool = True,
 ):
     # Get the project:
@@ -168,7 +164,6 @@ def pipeline(
             "use_better_transformers": True,
             "batch_size": batch_size,
             "translate_to_english": translate_to_english,
-
         },
         returns=[
             "transcriptions: path",
@@ -228,6 +223,7 @@ def pipeline(
 
     # Question-answering:
     question_answering_function = project.get_function("question-answering")
+    question_answering_function.with_requests(mem="20G")
     answer_questions_run = project.run_function(
         question_answering_function,
         handler="answer_questions",
@@ -259,11 +255,7 @@ def pipeline(
             ],
             "questions_config": [
                 {},
-                {
-                    "type": "poll",
-                    "poll_count": 3,
-                    "poll_strategy": "most_common"
-                }
+                {"type": "poll", "poll_count": 3, "poll_strategy": "most_common"},
             ],
             "generation_config": {
                 "max_new_tokens": 250,

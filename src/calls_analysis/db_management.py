@@ -58,6 +58,9 @@ class Client(Base):
     last_name: Mapped[str] = mapped_column(String(length=30))
     phone_number: Mapped[str] = mapped_column(String(length=20))
     email: Mapped[str] = mapped_column(String(length=50))
+    client_city: Mapped[str] = mapped_column(String(length=30))
+    latitude: Mapped[str] = mapped_column(String(length=20))
+    longitude: Mapped[str] = mapped_column(String(length=20))
 
     # Many-to-one relationship:
     calls: Mapped[List["Call"]] = relationship(back_populates="client", lazy=True)
@@ -90,7 +93,7 @@ class Call(Base):
     )
     date: Mapped[datetime.date] = mapped_column(Date())
     time: Mapped[datetime.time] = mapped_column(Time())
-    status: Mapped[CallStatus] = mapped_column(Enum(CallStatus))
+    status: Mapped[CallStatus] = mapped_column(Enum(CallStatus), nullable=True)
     # Files:
     audio_file: Mapped[str] = mapped_column(String(length=FILE_PATH_LENGTH))
     # TODO: processed_audio_file: Mapped[Optional[str]] = mapped_column(String(length=FILE_PATH_LENGTH))
@@ -187,16 +190,16 @@ class DBEngine:
 
     def update_db(self):
         if self.bucket_name:
-            s3 = boto3.client('s3')
+            s3 = boto3.client("s3")
             s3.upload_file(self.temp_file.name, self.bucket_name, "sqlite.db")
 
     def _create_engine(self):
         if self.bucket_name:
             # Create a temporary file that will persist throughout the object's lifetime
-            self.temp_file = tempfile.NamedTemporaryFile(suffix='.sqlite', delete=False)
+            self.temp_file = tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False)
             self.temp_file.close()  # Close the file but keep the name
 
-            s3 = boto3.client('s3')
+            s3 = boto3.client("s3")
             try:
                 s3.download_file(self.bucket_name, "sqlite.db", self.temp_file.name)
             except Exception as e:
@@ -215,6 +218,7 @@ class DBEngine:
             except:
                 pass
 
+
 def create_tables():
     """
     Create the call center schema tables for when creating or loading the MLRun project.
@@ -226,6 +230,7 @@ def create_tables():
     Base.metadata.create_all(engine.engine)
 
     engine.update_db()
+
 
 def insert_clients(context: mlrun.MLClientCtx, clients: list):
     # Create an engine:
@@ -240,6 +245,7 @@ def insert_clients(context: mlrun.MLClientCtx, clients: list):
 
     engine.update_db()
 
+
 def insert_agents(context: mlrun.MLClientCtx, agents: list):
     # Create an engine:
     engine = DBEngine(context)
@@ -253,8 +259,9 @@ def insert_agents(context: mlrun.MLClientCtx, agents: list):
 
     engine.update_db()
 
+
 def insert_calls(
-        context: mlrun.MLClientCtx, calls: pd.DataFrame
+    context: mlrun.MLClientCtx, calls: pd.DataFrame
 ) -> Tuple[pd.DataFrame, List[str]]:
     # Create an engine:
     engine = DBEngine(context)
@@ -277,11 +284,11 @@ def insert_calls(
 
 
 def update_calls(
-        context: mlrun.MLClientCtx,
-        status: str,
-        table_key: str,
-        data_key: str,
-        data: pd.DataFrame,
+    context: mlrun.MLClientCtx,
+    status: str,
+    table_key: str,
+    data_key: str,
+    data: pd.DataFrame,
 ):
     # Create an engine:
     engine = DBEngine(context)
@@ -307,6 +314,7 @@ def update_calls(
         )
 
     engine.update_db()
+
 
 def get_calls() -> pd.DataFrame:
     context = mlrun.get_or_create_ctx("get_calls")
