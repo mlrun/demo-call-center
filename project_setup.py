@@ -95,6 +95,26 @@ def setup(
     # Set the workflows:
     _set_workflows(project=project)
 
+    # Set UI application:
+    app = project.set_function(
+        name="call-center-ui",
+        kind="application",
+        requirements=["vizro>=0.1.38", "gunicorn"]
+    )
+    # Set the internal application port to Vizro's default port
+    app.set_internal_application_port(8050)
+
+    # Set the command to run the Vizro application
+    app.spec.command = "gunicorn"
+    app.spec.args = [
+        "app:app",
+        "--bind",
+        "0.0.0.0:8050",
+        "--chdir",
+        f"home/mlrun_code/vizro"
+    ]
+    app.save()
+
     # Create the DB tables:
     create_tables()
 
@@ -208,7 +228,7 @@ def _set_function(
     elif node_name:
         mlrun_function.with_node_selection(node_name=node_name)
 
-    if CE_MODE and apply_auto_mount:
+    if not CE_MODE and apply_auto_mount:
         # Apply auto mount:
         mlrun_function.apply(mlrun.auto_mount())
     # Save:

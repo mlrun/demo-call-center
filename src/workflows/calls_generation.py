@@ -57,7 +57,7 @@ def pipeline(
                     "phone_number",
                     "email",
                     "client_id: no leading zeros",
-                    "client_city: Enter city, state in the US (e.g., Austin, TX)",
+                    "client_city: Enter city, state in the US (e.g., Austin, TX), Not only Texas",
                     "latitude: That correspond to the city",
                     "longitude: That correspond to the city",
                 ],
