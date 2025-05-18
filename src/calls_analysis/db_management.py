@@ -182,6 +182,7 @@ class Call(Base):
 class DBEngine:
     def __init__(self, context: mlrun.MLClientCtx):
         self.bucket_name = context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME)
+        self.db_url = context.get_secret(key=ProjectSecrets.MYSQL_URL)
         self.temp_file = None
         self.engine = self._create_engine()
 
@@ -208,7 +209,7 @@ class DBEngine:
 
             return create_engine(f"sqlite:///{self.temp_file.name}")
         else:
-            return create_engine(url=os.environ[ProjectSecrets.MYSQL_URL])
+            return create_engine(url=self.db_url)
 
     def __del__(self):
         # Clean up the temporary file when the object is destroyed
