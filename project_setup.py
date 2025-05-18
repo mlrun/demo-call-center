@@ -61,6 +61,7 @@ def setup(
             os.environ["S3_BUCKET_NAME"] = bucket_name
         else:
             os.environ["MYSQL_URL"] = f"sqlite:///{os.path.abspath('.')}/data/sqlite.db"
+            mysql_url = os.environ["MYSQL_URL"]
 
     # Set the project git source:
     if source:
@@ -99,7 +100,7 @@ def setup(
     app = project.set_function(
         name="call-center-ui",
         kind="application",
-        requirements=["vizro>=0.1.38", "gunicorn"]
+        requirements=["vizro==0.1.38", "gunicorn"]
     )
     # Set the internal application port to Vizro's default port
     app.set_internal_application_port(8050)

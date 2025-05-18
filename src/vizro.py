@@ -50,8 +50,7 @@ def deploy_vizro_application():
     else:
         # Set the source path to V3IO
         src_path = f'v3io:///users/{os.environ["V3IO_USERNAME"]}/{os.getcwd().replace("/User/", "")}/{dir_name}.tar.gz'
-        print("")
-    # set src_path to V3IO
+        print(f"Configuring V3IO {src_path} to UI")
     project = mlrun.get_current_project()
     app = project.get_function("call-center-ui")
     app.with_source_archive(src_path, pull_at_runtime=False)
@@ -77,9 +76,8 @@ def _prepare_vizro_source(dir_name: str):
     )
     vizro_df = vizro_df.rename(columns=COLUMNS_MAPPING)
     vizro_df.to_csv("vizro/data.csv")
-    # add text and audio files to vizro:
 
-    # Copy the entire directory
+    # add text and audio files to vizro:
     shutil.copytree("outputs", "vizro/outputs", dirs_exist_ok=True)
 
     # Write the application code to a file

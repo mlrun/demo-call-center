@@ -204,7 +204,6 @@ class DBEngine:
             try:
                 s3.download_file(self.bucket_name, "sqlite.db", self.temp_file.name)
             except Exception as e:
-                # Handle case where file might not exist in S3 yet
                 print(f"Warning: Could not download database from S3: {e}")
 
             return create_engine(f"sqlite:///{self.temp_file.name}")
