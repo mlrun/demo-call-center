@@ -11,18 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 from pathlib import Path
 
 import mlrun
 import pandas as pd
 import yaml
 from mlrun.artifacts import ArtifactSpec, DatasetArtifact
-from sqlalchemy import create_engine, insert
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import insert
 
-from src.calls_analysis.db_management import Agent, Call, Client, create_tables
-from src.common import ProjectSecrets
+from src.calls_analysis.db_management import Agent, Call, Client, create_tables, DBEngine
 
 
 def skip_and_import_local_data(language: str):
@@ -36,10 +33,10 @@ def skip_and_import_local_data(language: str):
     project = mlrun.get_current_project()
 
     # clean and recreate database tables:
-    engine = create_engine(url=os.environ[ProjectSecrets.MYSQL_URL])
-    Call.__table__.drop(engine)
-    Client.__table__.drop(engine)
-    Agent.__table__.drop(engine)
+    engine = DBEngine(mlrun.get_or_create_ctx("skip"))
+    Call.__table__.drop(engine.engine)
+    Client.__table__.drop(engine.engine)
+    Agent.__table__.drop(engine.engine)
     create_tables()
     print("- Initialized tables")
 
@@ -142,10 +139,10 @@ def skip_and_import_local_data(language: str):
 
 def _insert_agents_and_clients_to_db(agents: list, clients: list):
     # Create an engine:
-    engine = create_engine(url=os.environ[ProjectSecrets.MYSQL_URL])
+    engine = DBEngine(mlrun.get_or_create_ctx("skip"))
 
     # Initialize a session maker:
-    session = sessionmaker(engine)
+    session = engine.get_session()
 
     # Insert the new calls into the table and commit:
     with session.begin() as sess:
