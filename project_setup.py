@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-
+from pathlib import Path
+import boto3
 import mlrun
 
 from src.calls_analysis.db_management import create_tables
 from src.common import ProjectSecrets
 
+CE_MODE = mlrun.mlconf.is_ce_mode()
 
 def setup(
     project: mlrun.projects.MlrunProject,
@@ -31,9 +33,9 @@ def setup(
     :returns: A fully prepared project for this demo.
     """
     # Unpack secrets from environment variables:
-    openai_key = os.environ[ProjectSecrets.OPENAI_API_KEY]
-    openai_base = os.environ[ProjectSecrets.OPENAI_API_BASE]
-    mysql_url = os.environ[ProjectSecrets.MYSQL_URL]
+    openai_key = os.getenv(ProjectSecrets.OPENAI_API_KEY)
+    openai_base = os.getenv(ProjectSecrets.OPENAI_API_BASE)
+    mysql_url = os.getenv(ProjectSecrets.MYSQL_URL, "")
 
     # Unpack parameters:
     source = project.get_param(key="source")
@@ -42,6 +44,24 @@ def setup(
     gpus = project.get_param(key="gpus", default=0)
     node_name = project.get_param(key="node_name", default=None)
     node_selector = project.get_param(key="node_selector", default=None)
+    use_sqlite = project.get_param(key="use_sqlite", default=False)
+
+    # Update sqlite data:
+    if use_sqlite:
+        # uploading db file to s3:
+        if CE_MODE:
+            s3 = boto3.client("s3")
+            bucket_name = Path(mlrun.mlconf.artifact_path).parts[1]
+            # Upload the file
+            s3.upload_file(
+                Filename="data/sqlite.db",
+                Bucket=bucket_name,
+                Key="sqlite.db",
+            )
+            os.environ["S3_BUCKET_NAME"] = bucket_name
+        else:
+            os.environ["MYSQL_URL"] = f"sqlite:///{os.path.abspath('.')}/data/sqlite.db"
+            mysql_url = os.environ["MYSQL_URL"]
 
     # Set the project git source:
     if source:
@@ -63,6 +83,7 @@ def setup(
         openai_key=openai_key,
         openai_base=openai_base,
         mysql_url=mysql_url,
+        bucket_name=os.getenv(ProjectSecrets.S3_BUCKET_NAME),
     )
 
     # Refresh MLRun hub to the most up-to-date version:
@@ -74,6 +95,26 @@ def setup(
 
     # Set the workflows:
     _set_workflows(project=project)
+
+    # Set UI application:
+    app = project.set_function(
+        name="call-center-ui",
+        kind="application",
+        requirements=["vizro==0.1.38", "gunicorn"]
+    )
+    # Set the internal application port to Vizro's default port
+    app.set_internal_application_port(8050)
+
+    # Set the command to run the Vizro application
+    app.spec.command = "gunicorn"
+    app.spec.args = [
+        "app:app",
+        "--bind",
+        "0.0.0.0:8050",
+        "--chdir",
+        f"home/mlrun_code/vizro"
+    ]
+    app.save()
 
     # Create the DB tables:
     create_tables()
@@ -136,6 +177,7 @@ def _set_secrets(
     openai_key: str,
     openai_base: str,
     mysql_url: str,
+    bucket_name: str = None,
 ):
     # Must have secrets:
     project.set_secrets(
@@ -145,6 +187,12 @@ def _set_secrets(
             ProjectSecrets.MYSQL_URL: mysql_url,
         }
     )
+    if bucket_name:
+        project.set_secrets(
+            secrets={
+                ProjectSecrets.S3_BUCKET_NAME: bucket_name,
+            }
+        )
 
 
 def _set_function(
@@ -157,6 +205,7 @@ def _set_function(
         with_repo: bool = None,
         image: str = None,
         node_selector: dict = None,
+        apply_auto_mount: bool = True,
 ):
     # Set the given function:
     if with_repo is None:
@@ -179,6 +228,10 @@ def _set_function(
     # Set the node selection:
     elif node_name:
         mlrun_function.with_node_selection(node_name=node_name)
+
+    if not CE_MODE and apply_auto_mount:
+        # Apply auto mount:
+        mlrun_function.apply(mlrun.auto_mount())
     # Save:
     mlrun_function.save()
 
@@ -194,6 +247,7 @@ def _set_calls_generation_functions(
         name="structured-data-generator",
         kind="job",
         node_name=node_name,
+        apply_auto_mount=True,
     )
 
     # Conversation generator:
@@ -203,6 +257,7 @@ def _set_calls_generation_functions(
         name="conversations-generator",
         kind="job",
         node_name=node_name,
+        apply_auto_mount=True,
     )
 
     # Text to audio generator:
@@ -212,6 +267,7 @@ def _set_calls_generation_functions(
         name="text-to-audio-generator",
         kind="job",
         with_repo=False,
+        apply_auto_mount=True,
     )
 
 
@@ -228,6 +284,7 @@ def _set_calls_analysis_functions(
         name="db-management",
         kind="job",
         node_name=node_name,
+        apply_auto_mount=True,
     )
 
     # Speech diarization:

@@ -1,0 +1,12 @@
+audio::-webkit-media-controls-panel, audio::-webkit-media-controls-enclosure {
+    border-radius: 0;
+    background: var(--surfaces-bg-card);
+}
+
+#outer_grid {
+    width: unset;
+}
+
+#transcript {
+    line-height: unset;
+}

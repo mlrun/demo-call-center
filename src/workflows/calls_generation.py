@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 from typing import List
 
 import kfp
-from kfp import dsl
 import mlrun
+from kfp import dsl
 
 
 @kfp.dsl.pipeline()
@@ -41,8 +40,9 @@ def pipeline(
 
     with dsl.Condition(generate_clients_and_agents == True) as generate_data_condition:
         # Generate client data:
-        client_data_generator_function = project.get_function("structured_data_generator")
-        client_data_generator_function.apply(mlrun.auto_mount())
+        client_data_generator_function = project.get_function(
+            "structured_data_generator"
+        )
         client_data_run = project.run_function(
             client_data_generator_function,
             handler="generate_data",
@@ -57,6 +57,9 @@ def pipeline(
                     "phone_number",
                     "email",
                     "client_id: no leading zeros",
+                    "client_city: Enter city, state in the US (e.g., Austin, TX), Not only Texas",
+                    "latitude: That correspond to the city",
+                    "longitude: That correspond to the city",
                 ],
             },
             returns=["clients: file"],
@@ -64,7 +67,6 @@ def pipeline(
 
         # Insert client data to database
         db_management_function = project.get_function("db-management")
-        db_management_function.apply(mlrun.auto_mount())
         project.run_function(
             db_management_function,
             handler="insert_clients",
@@ -75,8 +77,9 @@ def pipeline(
         )
 
         # Generate agent data:
-        agent_data_generator_function = project.get_function("structured_data_generator")
-        agent_data_generator_function.apply(mlrun.auto_mount())
+        agent_data_generator_function = project.get_function(
+            "structured_data_generator"
+        )
         agent_data_run = project.run_function(
             agent_data_generator_function,
             handler="generate_data",
@@ -96,7 +99,6 @@ def pipeline(
 
         # Insert agent data to database
         db_management_function = project.get_function("db-management")
-        db_management_function.apply(mlrun.auto_mount())
         project.run_function(
             db_management_function,
             handler="insert_agents",
@@ -108,7 +110,6 @@ def pipeline(
 
     # Get agents from database
     db_management_function = project.get_function("db-management")
-    db_management_function.apply(mlrun.auto_mount())
     get_agents_run = project.run_function(
         db_management_function,
         handler="get_agents",
@@ -118,7 +119,6 @@ def pipeline(
 
     # Get clients from database
     db_management_function = project.get_function("db-management")
-    db_management_function.apply(mlrun.auto_mount())
     get_clients_run = project.run_function(
         db_management_function,
         handler="get_clients",
@@ -128,7 +128,6 @@ def pipeline(
 
     # Generate conversations texts:
     conversations_generator_function = project.get_function("conversations-generator")
-    conversations_generator_function.apply(mlrun.auto_mount())
     generate_conversations_run = project.run_function(
         conversations_generator_function,
         handler="generate_conversations",
@@ -145,8 +144,8 @@ def pipeline(
             "to_time": to_time,
         },
         inputs={
-            "agent_data": get_agents_run.outputs['agents'],
-            "client_data": get_clients_run.outputs['clients'],
+            "agent_data": get_agents_run.outputs["agents"],
+            "client_data": get_clients_run.outputs["clients"],
         },
         returns=[
             "conversations: path",
@@ -157,7 +156,6 @@ def pipeline(
 
     # Text to audio:
     text_to_audio_generator_function = project.get_function("text-to-audio-generator")
-    text_to_audio_generator_function.apply(mlrun.auto_mount())
     generate_multi_speakers_audio_run = project.run_function(
         text_to_audio_generator_function,
         handler="generate_multi_speakers_audio",

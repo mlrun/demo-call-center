@@ -31,20 +31,19 @@ WORDS_IN_1_MINUTE = 240
 
 
 def generate_conversations(
-        context: mlrun.MLClientCtx,
-        amount: int,
-        agent_data: pd.DataFrame,
-        client_data: pd.DataFrame,
-        output_directory: str = None,
-        model_name: str = "gpt-3.5-turbo",
-        language: str = "en",
-        min_time: int = 2,
-        max_time: int = 5,
-        from_date: str = "01.01.2023",
-        to_date: str = "01.03.2023",
-        from_time: str = "09:00",
-        to_time: str = "17:00",
-
+    context: mlrun.MLClientCtx,
+    amount: int,
+    agent_data: pd.DataFrame,
+    client_data: pd.DataFrame,
+    output_directory: str = None,
+    model_name: str = "gpt-3.5-turbo",
+    language: str = "en",
+    min_time: int = 2,
+    max_time: int = 5,
+    from_date: str = "01.01.2023",
+    to_date: str = "01.03.2023",
+    from_time: str = "09:00",
+    to_time: str = "17:00",
 ) -> Tuple[str, pd.DataFrame, pd.DataFrame]:
     """
     Generates a list of conversations between an internet provider call center and a customer.
@@ -206,11 +205,10 @@ def generate_conversations(
             [
                 conversation_id,
                 conversation_text_path.name,
-                client['client_id'],
-                agent['agent_id'],
+                client["client_id"],
+                agent["agent_id"],
                 date,
                 time,
-
             ]
         )
         ground_truths.append(
@@ -223,8 +221,8 @@ def generate_conversations(
                 upsale_mapping[agent_upsales][1],
                 client_tone,
                 agent_tone,
-                client['client_id'],
-                agent['agent_id'],
+                client["client_id"],
+                agent["agent_id"],
                 empathy,
                 professionalism,
                 kindness,
