@@ -50,7 +50,7 @@ def setup(
     if use_sqlite:
         # uploading db file to s3:
         if CE_MODE:
-            s3 = boto3.client("s3")
+            s3 = boto3.client("s3") if not os.getenv("S3_ENDPOINT_URL") else boto3.client('s3', endpoint_url=os.getenv("S3_ENDPOINT_URL"))
             bucket_name = Path(mlrun.mlconf.artifact_path).parts[1]
             # Upload the file
             s3.upload_file(
