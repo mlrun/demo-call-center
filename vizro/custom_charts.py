@@ -1055,6 +1055,16 @@ def plot_butterfly_upsales_concerns(
     ).reset_index()
     pivot_df = pivot_df.sort_values("Month")
     month_labels = pivot_df["MonthLabel"]
+    if 'Upsales Success' not in pivot_df.columns:
+        pivot_df['Upsales Success'] = 0
+    else:
+        pivot_df['Upsales Success'].fillna(value=0, inplace=True)
+
+    
+    if 'Concerns Addressed' not in pivot_df.columns:
+        pivot_df['Concerns Addressed'] = 0
+    else:
+        pivot_df['Concerns Addressed'].fillna(value=0, inplace=True)   
     upsales_y = pivot_df["Upsales Success"].fillna(0)
     concerns_y = pivot_df["Concerns Addressed"].fillna(0)
     fig = go.Figure()
