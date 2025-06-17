@@ -180,6 +180,7 @@ def _set_secrets(
     bucket_name: str = None,
 ):
     # Must have secrets:
+    assert openai_key and openai_base, "openai_key and openai_base must be set"
     project.set_secrets(
         secrets={
             ProjectSecrets.OPENAI_API_KEY: openai_key,
