@@ -1033,6 +1033,7 @@ def plot_butterfly_upsales_concerns(
     """
     df = data_frame.copy()
     df["Month"] = df["Call Date"].dt.to_period("M")
+    df['Upsale Attempted'].fillna(False, inplace=True)
     upsales = (
         df[df["Upsale Attempted"]]
         .groupby("Month")["Upsale Success"]
