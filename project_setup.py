@@ -125,7 +125,7 @@ def setup(
 
 def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool):
     config = {
-        "base_image": "mlrun/mlrun-gpu" if with_gpu else "mlrun/mlrun",
+        "base_image": "mlrun/mlrun-gpu" if with_gpu else "mlrun/mlrun-kfp",
         "torch_index": "https://download.pytorch.org/whl/cu118" if with_gpu else "https://download.pytorch.org/whl/cpu",
         "onnx_package": "onnxruntime-gpu" if with_gpu else "onnxruntime"
     }
@@ -180,6 +180,7 @@ def _set_secrets(
     bucket_name: str = None,
 ):
     # Must have secrets:
+    assert openai_key and openai_base, "openai_key and openai_base must be set"
     project.set_secrets(
         secrets={
             ProjectSecrets.OPENAI_API_KEY: openai_key,
