@@ -16,6 +16,24 @@ from pathlib import Path
 import boto3
 import mlrun
 
+###########################
+import os
+import sys
+import sqlalchemy
+print(f'sqlalchemy version = {sqlalchemy.__version__}')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+print(f'current dir = {current_dir}')
+sys.path.insert(0, current_dir)
+parent_dir = os.path.join(current_dir, os.pardir)
+sys.path.insert(0, parent_dir)
+parent_dir = os.path.join(parent_dir, os.pardir)
+sys.path.insert(0, parent_dir)
+print(f'parent dir = {parent_dir}')
+print(f"Python version: {sys.version}")
+print("sys.path:", sys.path)
+print("PYTHONPATH (from environment):", os.environ.get('PYTHONPATH'))
+###########################
+
 from src.calls_analysis.db_management import create_tables
 from src.common import ProjectSecrets
 
@@ -45,7 +63,8 @@ def setup(
     node_name = project.get_param(key="node_name", default=None)
     node_selector = project.get_param(key="node_selector", default=None)
     use_sqlite = project.get_param(key="use_sqlite", default=False)
-
+    default_image_name = project.get_param(key="default_image_name", default=f'.mlrun-project-image-{project.name}')
+    print(f'default_image_name before = {default_image_name}')
     # Update sqlite data:
     if use_sqlite:
         # uploading db file to s3:
@@ -75,8 +94,8 @@ def setup(
     # Build the image:
     if build_image:
         print("Building default image for the demo:")
-        _build_image(project=project, with_gpu=gpus)
-
+        default_image_name = _build_image(project=project, with_gpu=gpus)
+    print(f'default_image_name after = {default_image_name}')
     # Set the secrets:
     _set_secrets(
         project=project,
@@ -94,7 +113,7 @@ def setup(
     _set_calls_analysis_functions(project=project, gpus=gpus, node_name=node_name, node_selector=node_selector)
 
     # Set the workflows:
-    _set_workflows(project=project)
+    _set_workflows(project=project, image=default_image_name)
 
     # Set UI application:
     app = project.set_function(
@@ -151,10 +170,16 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool):
     other_requirements = [
         "pip install mlrun langchain==0.2.17 openai==1.58.1 langchain_community==0.2.19 pydub==0.25.1 streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.2 librosa==0.10.1 presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0 htbuilder==0.6.2",
         "python -m spacy download en_core_web_lg",
-        "pip install -U SQLAlchemy",
+        "pip install SQLAlchemy==2.0.31",
         "pip uninstall -y onnxruntime-gpu onnxruntime",
         f"pip install {config['onnx_package']}",
+        "pip show sqlalchemy"
     ]
+    
+    # commands = [
+    #     "pip install SQLAlchemy==2.0.31",
+    #     "pip show sqlalchemy"
+    # ]
 
     # Combine commands in the required order
     commands = (
@@ -166,11 +191,15 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool):
     )
 
     # Build the image
-    assert project.build_image(
+    result = project.build_image(
         base_image=config["base_image"],
         commands=commands,
         set_as_default=True,
+        overwrite_build_params=True
     )
+    print(f"build result = {result}")
+    default_image_name = result.outputs["image"]
+    return default_image_name
 
 def _set_secrets(
     project: mlrun.projects.MlrunProject,
@@ -339,10 +368,10 @@ def _set_calls_analysis_functions(
     )
 
 
-def _set_workflows(project: mlrun.projects.MlrunProject):
+def _set_workflows(project: mlrun.projects.MlrunProject, image:str):
     project.set_workflow(
-        name="calls-generation", workflow_path="./src/workflows/calls_generation.py"
+        name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image=image
     )
     project.set_workflow(
-        name="calls-analysis", workflow_path="./src/workflows/calls_analysis.py"
+        name="calls-analysis", workflow_path="./src/workflows/calls_analysis.py", image=image
     )
