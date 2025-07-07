@@ -344,12 +344,19 @@ def _set_calls_analysis_functions(
 
 
 def _set_workflows(project: mlrun.projects.MlrunProject):
-    image = project.build_image(
+    
+    commands=['pip install SQLAlchemy==2.0.31', 
+              'echo "" > /empty/requirements.txt', 
+              'ls -l /empty/",
+              'ls -l /home/mlrun-code/", 
+              'rm -rf /home/mlrun-code/project_setup.py']
+    
+    assert project.build_image(
                         set_as_default=False,
                         base_image='mlrun/mlrun-kfp',
                         image ='.demo-call-center-kfp',
                         overwrite_build_params=True,
-                        commands=['pip install SQLAlchemy==2.0.31', 'echo "" > /empty/requirements.txt', 'rm -rf /home/mlrun-code/project_setup.py'])
+                        commands=commands)
 
     project.set_workflow(
         name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image='.demo-call-center-kfp'
