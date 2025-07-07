@@ -348,7 +348,8 @@ def _set_workflows(project: mlrun.projects.MlrunProject):
     commands=['pip install SQLAlchemy==2.0.31', 
               'echo "" > /empty/requirements.txt', 
               'ls -l /empty/',
-              'ls -l /home/mlrun-code/', 
+              'cat /empty/Dockerfile', 
+              'cat /empty/requirements.txt',
               'rm -rf /home/mlrun-code/project_setup.py']
     
     assert project.build_image(
