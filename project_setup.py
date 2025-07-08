@@ -154,7 +154,7 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_i
     other_requirements = [
         "pip install mlrun langchain==0.2.17 openai==1.58.1 langchain_community==0.2.19 pydub==0.25.1 streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.2 librosa==0.10.1 presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0 htbuilder==0.6.2",
         "python -m spacy download en_core_web_lg",
-        "pip install SQLAlchemy==2.0.31 pymysql",
+        "pip install SQLAlchemy==2.0.31 pymysql requests_toolbelt==0.10.1",
         "pip uninstall -y onnxruntime-gpu onnxruntime",
         f"pip install {config['onnx_package']}",
     ]
