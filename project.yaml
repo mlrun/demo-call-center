@@ -1,0 +1,71 @@
+kind: project
+status:
+  state: online
+spec:
+  workflows:
+  - image: .demo-call-center-kfp
+    path: ./src/workflows/calls_generation.py
+    name: calls-generation
+  - image: .demo-call-center-kfp
+    path: ./src/workflows/calls_analysis.py
+    name: calls-analysis
+  functions:
+  - url: hub://structured_data_generator
+    name: structured-data-generator
+    kind: job
+  - url: ./src/calls_generation/conversations_generator.py
+    name: conversations-generator
+    kind: job
+    with_repo: true
+  - url: hub://text_to_audio_generator
+    name: text-to-audio-generator
+    kind: job
+  - url: ./src/calls_analysis/db_management.py
+    name: db-management
+    kind: job
+    with_repo: true
+  - url: hub://silero_vad
+    name: silero-vad
+    kind: job
+  - url: hub://transcribe
+    name: transcription
+    kind: job
+  - url: hub://pii_recognizer
+    name: pii-recognition
+    kind: job
+  - url: hub://question_answering
+    name: question-answering
+    kind: job
+  - url: ./src/calls_analysis/postprocessing.py
+    name: postprocessing
+    kind: job
+  - name: call-center-ui
+    kind: application
+    requirements:
+    - vizro==0.1.38
+    - gunicorn
+  params:
+    build_image: false
+    source: git://github.com/xsqian/demo-call-center.git#main
+    gpus: 0
+    use_sqlite: true
+    default_image_name: .mlrun-project-image-zzz-xingsheng
+    default_image: .mlrun-project-image-zzz-xingsheng
+  build:
+    image: .demo-call-center-kfp
+    base_image: mlrun/mlrun-kfp
+    commands:
+    - pip install SQLAlchemy==2.0.31 &&           echo "" > /empty/requirements.txt
+      &&           ls -l /empty/ &&           cat /empty/Dockerfile &&           ls
+      -l /home/ &&           rm -rf /home/mlrun-code/project_setup.py
+    source_code_target_dir: /home/mlrun_code/
+  source: git://github.com/xsqian/demo-call-center.git#main
+  origin_url: git://github.com/xsqian/demo-call-center.git#refs/heads/main
+  desired_state: online
+  conda: ''
+  owner: xingsheng
+  load_source_on_run: false
+  default_image: .mlrun-project-image-zzz-xingsheng
+metadata:
+  created: '2025-07-05T02:14:10.304000'
+  name: zzz-xingsheng
