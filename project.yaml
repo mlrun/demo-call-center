@@ -1,14 +1,37 @@
 kind: project
+metadata:
+  created: '2025-07-08T18:28:26.407000'
+  name: zzz-xingsheng
 status:
   state: online
 spec:
+  conda: ''
+  owner: xingsheng
+  build:
+    source_code_target_dir: /home/mlrun_code/
+    image: .demo-call-center-kfp
+    commands:
+    - pip install SQLAlchemy==2.0.31 &&           echo "" > /empty/requirements.txt
+      &&           ls -l /empty/ &&           cat /empty/Dockerfile &&           ls
+      -l /home/ &&           rm -rf /home/mlrun-code/project_setup.py
+    base_image: mlrun/mlrun-kfp
   workflows:
-  - image: .demo-call-center-kfp
+  - name: calls-generation
+    image: .demo-call-center-kfp
     path: ./src/workflows/calls_generation.py
-    name: calls-generation
-  - image: .demo-call-center-kfp
+  - name: calls-analysis
+    image: .demo-call-center-kfp
     path: ./src/workflows/calls_analysis.py
-    name: calls-analysis
+  params:
+    build_image: false
+    source: git://github.com/xsqian/demo-call-center.git#main
+    gpus: 0
+    use_sqlite: false
+    default_image_name: .mlrun-project-image-zzz-xingsheng
+    default_image: .mlrun-project-image-zzz-xingsheng
+  source: git://github.com/xsqian/demo-call-center.git#main
+  desired_state: online
+  default_image: .mlrun-project-image-zzz-xingsheng
   functions:
   - url: hub://structured_data_generator
     name: structured-data-generator
@@ -44,28 +67,5 @@ spec:
     requirements:
     - vizro==0.1.38
     - gunicorn
-  params:
-    build_image: false
-    source: git://github.com/xsqian/demo-call-center.git#main
-    gpus: 0
-    use_sqlite: true
-    default_image_name: .mlrun-project-image-zzz-xingsheng
-    default_image: .mlrun-project-image-zzz-xingsheng
-  build:
-    image: .demo-call-center-kfp
-    base_image: mlrun/mlrun-kfp
-    commands:
-    - pip install SQLAlchemy==2.0.31 &&           echo "" > /empty/requirements.txt
-      &&           ls -l /empty/ &&           cat /empty/Dockerfile &&           ls
-      -l /home/ &&           rm -rf /home/mlrun-code/project_setup.py
-    source_code_target_dir: /home/mlrun_code/
-  source: git://github.com/xsqian/demo-call-center.git#main
   origin_url: git://github.com/xsqian/demo-call-center.git#refs/heads/main
-  desired_state: online
-  conda: ''
-  owner: xingsheng
   load_source_on_run: false
-  default_image: .mlrun-project-image-zzz-xingsheng
-metadata:
-  created: '2025-07-05T02:14:10.304000'
-  name: zzz-xingsheng
