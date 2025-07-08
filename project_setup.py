@@ -76,7 +76,7 @@ def setup(
     # Build the image:
     if build_image:
         print("Building default image for the demo:")
-        _build_image(project=project, with_gpu=gpus)
+        _build_image(project=project, with_gpu=gpus, default_image=default_image)
 
     # Set the secrets:
     _set_secrets(
@@ -124,7 +124,7 @@ def setup(
     project.save()
     return project
 
-def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool):
+def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_image):
     config = {
         "base_image": "mlrun/mlrun-gpu" if with_gpu else "mlrun/mlrun-kfp",
         "torch_index": "https://download.pytorch.org/whl/cu118" if with_gpu else "https://download.pytorch.org/whl/cpu",
@@ -172,11 +172,31 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool):
 
     # Build the image
     assert project.build_image(
+        image = default_image,
         base_image=config["base_image"],
         commands=commands,
         set_as_default=True,
+        overwrite_build_params=True
     )
-
+    
+    # builld the workflow inmage, but set_as_default=False
+    
+    workflow_commands=['pip install SQLAlchemy==2.0.31 && \
+          echo "" > /empty/requirements.txt && \
+          ls -l /empty/ && \
+          cat /empty/Dockerfile && \
+          ls -l /home/ && \
+          rm -rf /home/mlrun-code/project_setup.py'
+         ]
+    
+    assert project.build_image(
+                        set_as_default=False,
+                        base_image='mlrun/mlrun-kfp',
+                        image ='.demo-call-center-kfp',
+                        overwrite_build_params=True,
+                        commands=workflow_commands)
+    
+    
 def _set_secrets(
     project: mlrun.projects.MlrunProject,
     openai_key: str,
@@ -344,20 +364,6 @@ def _set_calls_analysis_functions(
 
 
 def _set_workflows(project: mlrun.projects.MlrunProject):
-    
-    commands=['pip install SQLAlchemy==2.0.31', 
-              'echo "" > /empty/requirements.txt', 
-              'ls -l /empty/',
-              'cat /empty/Dockerfile', 
-              'cat /empty/requirements.txt',
-              'rm -rf /home/mlrun-code/project_setup.py']
-    
-    assert project.build_image(
-                        set_as_default=False,
-                        base_image='mlrun/mlrun-kfp',
-                        image ='.demo-call-center-kfp',
-                        overwrite_build_params=True,
-                        commands=commands)
 
     project.set_workflow(
         name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image='.demo-call-center-kfp'
