@@ -374,8 +374,8 @@ def _set_calls_analysis_functions(
 def _set_workflows(project: mlrun.projects.MlrunProject):
 
     project.set_workflow(
-        name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image='.mlrun-project-image-zzz-xingsheng'
+        name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image='.mlrun-project-image-zzz'
     )
     project.set_workflow(
-        name="calls-analysis", workflow_path="./src/workflows/calls_analysis.py", image='.mlrun-project-image-zzz-xingsheng'
+        name="calls-analysis", workflow_path="./src/workflows/calls_analysis.py", image='.mlrun-project-image-zzz'
     )
