@@ -183,7 +183,7 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_i
     
     # builld the workflow inmage, but set_as_default=False
     
-    workflow_commands=['pip install SQLAlchemy==2.0.31 && \
+    workflow_commands=['pip install SQLAlchemy==2.0.31 pymysql && \
           echo "" > /empty/requirements.txt && \
           ls -l /empty/ && \
           cat /empty/Dockerfile && \
