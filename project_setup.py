@@ -93,8 +93,8 @@ def setup(
     mlrun.get_run_db().get_hub_catalog(source_name="default", force_refresh=True)
 
     # Set the functions:
-    _set_calls_generation_functions(project=project, node_name=node_name)
-    _set_calls_analysis_functions(project=project, gpus=gpus, node_name=node_name, node_selector=node_selector)
+    _set_calls_generation_functions(project=project, node_name=node_name, image=default_image)
+    _set_calls_analysis_functions(project=project, gpus=gpus, node_name=node_name, node_selector=node_selector, image=default_image)
 
     # Set the workflows:
     _set_workflows(project=project)
@@ -267,6 +267,7 @@ def _set_function(
 def _set_calls_generation_functions(
     project: mlrun.projects.MlrunProject,
     node_name: str = None,
+    image: str = ".mlrun-project-image-zzz"
 ):
     # Client and agent data generator
     _set_function(
@@ -284,6 +285,7 @@ def _set_calls_generation_functions(
         func="./src/calls_generation/conversations_generator.py",
         name="conversations-generator",
         kind="job",
+        image=image,
         node_name=node_name,
         apply_auto_mount=True,
     )
@@ -304,6 +306,7 @@ def _set_calls_analysis_functions(
     gpus: int,
     node_name: str = None,
     node_selector: dict = None,
+    image: str = ".mlrun-project-image-zzz"
 ):
     # DB management:
     _set_function(
@@ -311,6 +314,7 @@ def _set_calls_analysis_functions(
         func="./src/calls_analysis/db_management.py",
         name="db-management",
         kind="job",
+        image = image,
         node_name=node_name,
         apply_auto_mount=True,
     )
@@ -362,6 +366,7 @@ def _set_calls_analysis_functions(
         name="postprocessing",
         with_repo=False,
         kind="job",
+        image=image,
         node_name=node_name,
     )
 
