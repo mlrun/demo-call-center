@@ -261,6 +261,8 @@ def _set_function(
         # Apply auto mount:
         mlrun_function.apply(mlrun.auto_mount())
     # Save:
+    print(f"function name ========>>>>>>>>> {name}")
+    print(f"function image ========>>>>>>>>> {image}")
     mlrun_function.save()
 
 
