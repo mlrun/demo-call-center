@@ -1,37 +1,46 @@
 kind: project
-metadata:
-  created: '2025-07-08T18:28:26.407000'
-  name: zzz-xingsheng
 status:
   state: online
 spec:
-  conda: ''
-  owner: xingsheng
-  build:
-    source_code_target_dir: /home/mlrun_code/
-    image: .demo-call-center-kfp
-    commands:
-    - pip install SQLAlchemy==2.0.31 &&           echo "" > /empty/requirements.txt
-      &&           ls -l /empty/ &&           cat /empty/Dockerfile &&           ls
-      -l /home/ &&           rm -rf /home/mlrun-code/project_setup.py
-    base_image: mlrun/mlrun-kfp
   workflows:
-  - name: calls-generation
-    image: .demo-call-center-kfp
+  - image: .mlrun-project-image-zzz
     path: ./src/workflows/calls_generation.py
-  - name: calls-analysis
-    image: .demo-call-center-kfp
+    name: calls-generation
+  - image: .mlrun-project-image-zzz
     path: ./src/workflows/calls_analysis.py
+    name: calls-analysis
+  default_image: .mlrun-project-image-zzz
+  origin_url: git://github.com/xsqian/demo-call-center.git#refs/heads/main
+  owner: xingsheng
+  conda: ''
+  source: git://github.com/xsqian/demo-call-center.git#main
+  desired_state: online
+  build:
+    image: .mlrun-project-image-zzz
+    base_image: mlrun/mlrun-kfp
+    commands:
+    - apt-get update -y && apt-get install ffmpeg -y
+    - pip install transformers==4.44.1
+    - pip install torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 --index-url https://download.pytorch.org/whl/cpu
+    - pip install bitsandbytes==0.41.1 accelerate==0.24.1 datasets==2.14.6 peft==0.5.0
+      optimum==1.13.2
+    - pip install mlrun langchain==0.2.17 openai==1.58.1 langchain_community==0.2.19
+      pydub==0.25.1 streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.2 librosa==0.10.1
+      presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0
+      htbuilder==0.6.2
+    - python -m spacy download en_core_web_lg
+    - pip install SQLAlchemy==2.0.31 pymysql requests_toolbelt==0.10.1
+    - pip uninstall -y onnxruntime-gpu onnxruntime
+    - pip install onnxruntime
+    source_code_target_dir: /home/mlrun_code/
   params:
     build_image: false
     source: git://github.com/xsqian/demo-call-center.git#main
     gpus: 0
     use_sqlite: false
     default_image_name: .mlrun-project-image-zzz-xingsheng
-    default_image: .mlrun-project-image-zzz-xingsheng
-  source: git://github.com/xsqian/demo-call-center.git#main
-  desired_state: online
-  default_image: .mlrun-project-image-zzz-xingsheng
+    default_image: .mlrun-project-image-zzz
+  load_source_on_run: false
   functions:
   - url: hub://structured_data_generator
     name: structured-data-generator
@@ -39,6 +48,7 @@ spec:
   - url: ./src/calls_generation/conversations_generator.py
     name: conversations-generator
     kind: job
+    image: .mlrun-project-image-zzz
     with_repo: true
   - url: hub://text_to_audio_generator
     name: text-to-audio-generator
@@ -46,6 +56,7 @@ spec:
   - url: ./src/calls_analysis/db_management.py
     name: db-management
     kind: job
+    image: .mlrun-project-image-zzz
     with_repo: true
   - url: hub://silero_vad
     name: silero-vad
@@ -62,10 +73,12 @@ spec:
   - url: ./src/calls_analysis/postprocessing.py
     name: postprocessing
     kind: job
+    image: .mlrun-project-image-zzz
   - name: call-center-ui
     kind: application
     requirements:
     - vizro==0.1.38
     - gunicorn
-  origin_url: git://github.com/xsqian/demo-call-center.git#refs/heads/main
-  load_source_on_run: false
+metadata:
+  name: zzz-xingsheng
+  created: '2025-07-08T18:28:26.407000'
