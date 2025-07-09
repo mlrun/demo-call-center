@@ -290,6 +290,7 @@ def _set_calls_generation_functions(
         image=image,
         node_name=node_name,
         apply_auto_mount=True,
+        with_repo=False,
     )
 
     # Text to audio generator:
@@ -319,6 +320,7 @@ def _set_calls_analysis_functions(
         image = image,
         node_name=node_name,
         apply_auto_mount=True,
+        with_repo=False,
     )
 
     # Speech diarization:
