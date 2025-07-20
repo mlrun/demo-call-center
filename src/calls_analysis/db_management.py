@@ -208,7 +208,7 @@ class DBEngine:
 
             return create_engine(f"sqlite:///{self.temp_file.name}")
         else:
-            return create_engine(url=self.db_url)
+            return create_engine(url=self.db_url, echo=True)
 
     def __del__(self):
         # Clean up the temporary file when the object is destroyed
@@ -224,10 +224,11 @@ def create_tables():
     Create the call center schema tables for when creating or loading the MLRun project.
     """
     # Create an engine:
-    engine = DBEngine(mlrun.get_or_create_ctx("create_tables"))
-
-    # Create the schema's tables:
-    Base.metadata.create_all(engine.engine)
+    engine = DBEngine(mlrun.get_or_create_ctx("create_tables")).engine
+    # first trop the tables if they exist
+    Base.metadata.drop_all(engine)
+    # Create the schema's tables
+    Base.metadata.create_all(engine)
 
     engine.update_db()
 
