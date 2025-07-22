@@ -97,7 +97,7 @@ def setup(
     _set_calls_analysis_functions(project=project, gpus=gpus, node_name=node_name, node_selector=node_selector, image=default_image)
 
     # Set the workflows:
-    _set_workflows(project=project)
+    _set_workflows(project=project, image=default_image)
 
     # Set UI application:
     app = project.set_function(
@@ -352,7 +352,7 @@ def _set_calls_analysis_functions(
     )
 
 
-def _set_workflows(project: mlrun.projects.MlrunProject, image=build_image):
+def _set_workflows(project: mlrun.projects.MlrunProject, image):
 
     project.set_workflow(
         name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image=image
