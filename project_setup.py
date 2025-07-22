@@ -78,8 +78,6 @@ def setup(
         print("Building default image for the demo:")
         _build_image(project=project, with_gpu=gpus, default_image=default_image)
 
-    print(f"use_sqlite ========>>>>>>> {use_sqlite}")
-    print(f"Before set secrets mysql_url ========>>>>>>> {mysql_url}")    
     # Set the secrets:
     _set_secrets(
         project=project,
@@ -185,7 +183,6 @@ def _set_secrets(
     mysql_url: str,
     bucket_name: str = None,
 ):
-    print(f"Inside _set_secrets mysql_url ========>>>>>>> {mysql_url}")    
     # Must have secrets:
     project.set_secrets(
         secrets={
