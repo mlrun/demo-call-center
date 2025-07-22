@@ -185,7 +185,7 @@ class DBEngine:
         self.db_url = context.get_secret(key=ProjectSecrets.MYSQL_URL)
         self.temp_file = None
         self.engine = self._create_engine()
-        print(f"self.db_url => {self.db_url}")
+        
     def get_session(self):
         return sessionmaker(self.engine)
 

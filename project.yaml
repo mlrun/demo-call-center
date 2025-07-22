@@ -1,22 +1,20 @@
-metadata:
-  name: call-center-demo-xingsheng
-  created: '2025-07-21T22:58:34.737000'
-kind: project
 status:
   state: online
+metadata:
+  created: '2025-07-21T22:58:34.737000'
+  name: call-center-demo-xingsheng
+kind: project
 spec:
+  params:
+    build_image: false
+    source: git://github.com/xsqian/demo-call-center.git#main
+    gpus: 0
+    use_sqlite: false
+    default_image_name: .mlrun-project-image-zzz-xingsheng
+    default_image: .mlrun-project-image-call-center-demo
+  origin_url: git://github.com/xsqian/demo-call-center.git#refs/heads/main
   desired_state: online
-  owner: xingsheng
-  conda: ''
   load_source_on_run: false
-  default_image: .mlrun-project-image-call-center-demo
-  workflows:
-  - name: calls-generation
-    path: ./src/workflows/calls_generation.py
-    image: .mlrun-project-image-zzz
-  - name: calls-analysis
-    path: ./src/workflows/calls_analysis.py
-    image: .mlrun-project-image-zzz
   functions:
   - url: hub://structured_data_generator
     name: structured-data-generator
@@ -53,16 +51,9 @@ spec:
     requirements:
     - vizro==0.1.38
     - gunicorn
-  params:
-    build_image: false
-    source: git://github.com/xsqian/demo-call-center.git#main
-    gpus: 0
-    use_sqlite: false
-    default_image_name: .mlrun-project-image-zzz-xingsheng
-    default_image: .mlrun-project-image-call-center-demo
-  origin_url: git://github.com/xsqian/demo-call-center.git#refs/heads/main
   build:
-    base_image: mlrun/mlrun-kfp
+    source_code_target_dir: /home/mlrun_code/
+    image: .mlrun-project-image-call-center-demo
     commands:
     - apt-get update -y && apt-get install ffmpeg -y
     - pip install transformers==4.44.1
@@ -77,6 +68,15 @@ spec:
     - pip install SQLAlchemy==2.0.31 pymysql requests_toolbelt==0.10.1
     - pip uninstall -y onnxruntime-gpu onnxruntime
     - pip install onnxruntime
-    image: .mlrun-project-image-zzz
-    source_code_target_dir: /home/mlrun_code/
+    base_image: mlrun/mlrun-kfp
+  conda: ''
   source: git://github.com/xsqian/demo-call-center.git#main
+  owner: xingsheng
+  default_image: .mlrun-project-image-call-center-demo
+  workflows:
+  - path: ./src/workflows/calls_generation.py
+    name: calls-generation
+    image: .mlrun-project-image-call-center-demo
+  - path: ./src/workflows/calls_analysis.py
+    name: calls-analysis
+    image: .mlrun-project-image-call-center-demo
