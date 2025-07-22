@@ -208,7 +208,7 @@ class DBEngine:
 
             return create_engine(f"sqlite:///{self.temp_file.name}")
         else:
-            return create_engine(url=self.db_url, echo=True)
+            return create_engine(url=self.db_url)
 
     def __del__(self):
         # Clean up the temporary file when the object is destroyed
@@ -225,8 +225,6 @@ def create_tables():
     """
     # Create an engine:
     engine = DBEngine(mlrun.get_or_create_ctx("create_tables"))
-    # first trop the tables if they exist
-    Base.metadata.drop_all(engine.engine)
     # Create the schema's tables
     Base.metadata.create_all(engine.engine)
 

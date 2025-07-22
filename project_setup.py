@@ -157,11 +157,7 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_i
         "pip install SQLAlchemy==2.0.31 pymysql requests_toolbelt==0.10.1",
         "pip uninstall -y onnxruntime-gpu onnxruntime",
         f"pip install {config['onnx_package']}",
-    ]
-    
-    # if python 
-    # other_requirements += ['pip install protobuf==3.20.30']
-    
+    ]    
 
     # Combine commands in the required order
     commands = (
@@ -180,23 +176,6 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_i
         set_as_default=True,
         overwrite_build_params=True
     )
-    
-    # builld the workflow inmage, but set_as_default=False
-    
-#     workflow_commands=['pip install SQLAlchemy==2.0.31 pymysql && \
-#           echo "" > /empty/requirements.txt && \
-#           ls -l /empty/ && \
-#           cat /empty/Dockerfile && \
-#           ls -l /home/ && \
-#           rm -rf /home/mlrun-code/project_setup.py'
-#          ]
-    
-#     assert project.build_image(
-#                         set_as_default=False,
-#                         base_image='mlrun/mlrun-kfp',
-#                         image ='.demo-call-center-kfp',
-#                         overwrite_build_params=True,
-#                         commands=workflow_commands)
     
     
 def _set_secrets(
@@ -261,8 +240,6 @@ def _set_function(
         # Apply auto mount:
         mlrun_function.apply(mlrun.auto_mount())
     # Save:
-    print(f"function name ========>>>>>>>>> {name}")
-    print(f"function image ========>>>>>>>>> {image}")
     mlrun_function.save()
 
 
@@ -375,11 +352,11 @@ def _set_calls_analysis_functions(
     )
 
 
-def _set_workflows(project: mlrun.projects.MlrunProject):
+def _set_workflows(project: mlrun.projects.MlrunProject, image=build_image):
 
     project.set_workflow(
-        name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image='.mlrun-project-image-zzz'
+        name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image=image
     )
     project.set_workflow(
-        name="calls-analysis", workflow_path="./src/workflows/calls_analysis.py", image='.mlrun-project-image-zzz'
+        name="calls-analysis", workflow_path="./src/workflows/calls_analysis.py", image=image
     )
