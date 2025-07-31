@@ -185,7 +185,7 @@ class DBEngine:
         self.db_url = context.get_secret(key=ProjectSecrets.MYSQL_URL)
         self.temp_file = None
         self.engine = self._create_engine()
-
+        
     def get_session(self):
         return sessionmaker(self.engine)
 
@@ -225,8 +225,7 @@ def create_tables():
     """
     # Create an engine:
     engine = DBEngine(mlrun.get_or_create_ctx("create_tables"))
-
-    # Create the schema's tables:
+    # Create the schema's tables
     Base.metadata.create_all(engine.engine)
 
     engine.update_db()

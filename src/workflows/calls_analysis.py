@@ -17,6 +17,14 @@ import kfp
 import mlrun
 from kfp import dsl
 
+import os
+import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.join(current_dir, os.pardir)
+sys.path.insert(0, parent_dir)
+parent_dir = os.path.join(parent_dir, os.pardir)
+sys.path.insert(0, parent_dir)
+
 from src.common import TONES, TOPICS, CallStatus
 
 QUESTIONS = [
