@@ -1,20 +1,17 @@
+kind: project
 status:
   state: online
 metadata:
-  created: '2025-07-21T22:58:34.737000'
-  name: call-center-demo-xingsheng
-kind: project
+  created: '2025-07-31T22:36:27.957000'
+  name: call-center-demo-jovyan
 spec:
-  params:
-    build_image: false
-    source: git://github.com/xsqian/demo-call-center.git#main
-    gpus: 0
-    use_sqlite: false
-    default_image_name: .mlrun-project-image-zzz-xingsheng
-    default_image: .mlrun-project-image-call-center-demo
-  origin_url: git://github.com/xsqian/demo-call-center.git#refs/heads/main
-  desired_state: online
-  load_source_on_run: false
+  workflows:
+  - path: ./src/workflows/calls_generation.py
+    name: calls-generation
+    image: .mlrun-project-image-call-center-demo
+  - path: ./src/workflows/calls_analysis.py
+    name: calls-analysis
+    image: .mlrun-project-image-call-center-demo
   functions:
   - url: hub://structured_data_generator
     name: structured-data-generator
@@ -51,9 +48,18 @@ spec:
     requirements:
     - vizro==0.1.38
     - gunicorn
+  source: git://github.com/mlrun/demo-call-center.git#main
+  default_image: .mlrun-project-image-call-center-demo
+  params:
+    build_image: false
+    source: git://github.com/mlrun/demo-call-center.git#main
+    gpus: 0
+    use_sqlite: true
+    default_image: .mlrun-project-image-call-center-demo
+  origin_url: git://github.com/mlrun/demo-call-center.git#refs/heads/main
   build:
-    source_code_target_dir: /home/mlrun_code/
     image: .mlrun-project-image-call-center-demo
+    source_code_target_dir: /home/mlrun_code/
     commands:
     - apt-get update -y && apt-get install ffmpeg -y
     - pip install transformers==4.44.1
@@ -69,14 +75,6 @@ spec:
     - pip uninstall -y onnxruntime-gpu onnxruntime
     - pip install onnxruntime
     base_image: mlrun/mlrun-kfp
+  desired_state: online
+  load_source_on_run: false
   conda: ''
-  source: git://github.com/xsqian/demo-call-center.git#main
-  owner: xingsheng
-  default_image: .mlrun-project-image-call-center-demo
-  workflows:
-  - path: ./src/workflows/calls_generation.py
-    name: calls-generation
-    image: .mlrun-project-image-call-center-demo
-  - path: ./src/workflows/calls_analysis.py
-    name: calls-analysis
-    image: .mlrun-project-image-call-center-demo
