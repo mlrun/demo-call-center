@@ -1,7 +1,11 @@
+metadata:
+  name: call-center-demo
+  created: '2025-08-15T16:09:53.750000'
+kind: project
 status:
   state: online
-kind: project
 spec:
+  load_source_on_run: false
   functions:
   - url: hub://structured_data_generator
     name: structured-data-generator
@@ -38,11 +42,7 @@ spec:
     requirements:
     - vizro==0.1.38
     - gunicorn
-  source: git://github.com/xsqian/demo-call-center.git#main
-  origin_url: git://github.com/xsqian/demo-call-center.git#refs/heads/main
-  owner: xingsheng
-  load_source_on_run: false
-  conda: ''
+  desired_state: online
   build:
     commands:
     - apt-get update -y && apt-get install ffmpeg -y
@@ -59,24 +59,22 @@ spec:
     - pip uninstall -y onnxruntime-gpu onnxruntime
     - pip install onnxruntime
     source_code_target_dir: /home/mlrun_code/
+    image: .mlrun-project-image-call-center-demo
     base_image: mlrun/mlrun-kfp
-    image: .mlrun-project-image-call-center-demo
+  origin_url: git://github.com/mlrun/demo-call-center.git#refs/heads/main
   workflows:
-  - name: calls-generation
-    image: .mlrun-project-image-call-center-demo
+  - image: .mlrun-project-image-call-center-demo
+    name: calls-generation
     path: ./src/workflows/calls_generation.py
-  - name: calls-analysis
-    image: .mlrun-project-image-call-center-demo
+  - image: .mlrun-project-image-call-center-demo
+    name: calls-analysis
     path: ./src/workflows/calls_analysis.py
-  desired_state: online
-  default_image: .mlrun-project-image-call-center-demo
   params:
     build_image: false
-    source: git://github.com/xsqian/demo-call-center.git#main
+    source: git://github.com/mlrun/demo-call-center.git#main
     gpus: 0
     use_sqlite: false
-    default_image_name: .mlrun-project-image-zzz-xingsheng
     default_image: .mlrun-project-image-call-center-demo
-metadata:
-  created: '2025-07-21T22:58:34.737000'
-  name: call-center-demo-xingsheng
+  source: git://github.com/mlrun/demo-call-center.git#main
+  conda: ''
+  default_image: .mlrun-project-image-call-center-demo
