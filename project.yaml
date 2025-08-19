@@ -1,17 +1,11 @@
+metadata:
+  name: call-center-demo
+  created: '2025-08-15T16:09:53.750000'
 kind: project
 status:
   state: online
-metadata:
-  created: '2025-07-31T22:36:27.957000'
-  name: call-center-demo-jovyan
 spec:
-  workflows:
-  - path: ./src/workflows/calls_generation.py
-    name: calls-generation
-    image: .mlrun-project-image-call-center-demo
-  - path: ./src/workflows/calls_analysis.py
-    name: calls-analysis
-    image: .mlrun-project-image-call-center-demo
+  load_source_on_run: false
   functions:
   - url: hub://structured_data_generator
     name: structured-data-generator
@@ -48,18 +42,8 @@ spec:
     requirements:
     - vizro==0.1.38
     - gunicorn
-  source: git://github.com/mlrun/demo-call-center.git#main
-  default_image: .mlrun-project-image-call-center-demo
-  params:
-    build_image: false
-    source: git://github.com/mlrun/demo-call-center.git#main
-    gpus: 0
-    use_sqlite: true
-    default_image: .mlrun-project-image-call-center-demo
-  origin_url: git://github.com/mlrun/demo-call-center.git#refs/heads/main
+  desired_state: online
   build:
-    image: .mlrun-project-image-call-center-demo
-    source_code_target_dir: /home/mlrun_code/
     commands:
     - apt-get update -y && apt-get install ffmpeg -y
     - pip install transformers==4.44.1
@@ -74,7 +58,23 @@ spec:
     - pip install SQLAlchemy==2.0.31 pymysql requests_toolbelt==0.10.1
     - pip uninstall -y onnxruntime-gpu onnxruntime
     - pip install onnxruntime
+    source_code_target_dir: /home/mlrun_code/
+    image: .mlrun-project-image-call-center-demo
     base_image: mlrun/mlrun-kfp
-  desired_state: online
-  load_source_on_run: false
+  origin_url: git://github.com/mlrun/demo-call-center.git#refs/heads/main
+  workflows:
+  - image: .mlrun-project-image-call-center-demo
+    name: calls-generation
+    path: ./src/workflows/calls_generation.py
+  - image: .mlrun-project-image-call-center-demo
+    name: calls-analysis
+    path: ./src/workflows/calls_analysis.py
+  params:
+    build_image: false
+    source: git://github.com/mlrun/demo-call-center.git#main
+    gpus: 0
+    use_sqlite: false
+    default_image: .mlrun-project-image-call-center-demo
+  source: git://github.com/mlrun/demo-call-center.git#main
   conda: ''
+  default_image: .mlrun-project-image-call-center-demo
