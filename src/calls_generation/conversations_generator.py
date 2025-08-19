@@ -110,7 +110,7 @@ def generate_conversations(
         "1. Opening (greeting and customer details validation and confirmation)\n"
         "2. Presenting the problem by the customer"
         "3. The agent {concern_addressed} address the client's concern.\n"
-        "4. The Agent {agent_upsales}"
+        "4. The Agent {agent_upsales_options}"
         "5. Summerizing and closing the call"
         "It has to be about a client who is calling to discuss about {topic}.\n"
         "Do not add any descriptive tag and do not mark the end of the conversation with [End of conversation].\n"
