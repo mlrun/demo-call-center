@@ -40,8 +40,8 @@ def generate_conversations(
     language: str = "en",
     min_time: int = 2,
     max_time: int = 5,
-    from_date: str = "01.01.2023",
-    to_date: str = "01.03.2023",
+    from_date: str = "09.01.2024",
+    to_date: str = "08.31.2025",
     from_time: str = "09:00",
     to_time: str = "17:00",
 ) -> Tuple[str, pd.DataFrame, pd.DataFrame]:
@@ -110,7 +110,7 @@ def generate_conversations(
         "1. Opening (greeting and customer details validation and confirmation)\n"
         "2. Presenting the problem by the customer"
         "3. The agent {concern_addressed} address the client's concern.\n"
-        "4. The Agent {agent_upsales_options}"
+        "4. The Agent {agent_upsales}"
         "5. Summerizing and closing the call"
         "It has to be about a client who is calling to discuss about {topic}.\n"
         "Do not add any descriptive tag and do not mark the end of the conversation with [End of conversation].\n"
