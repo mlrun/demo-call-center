@@ -224,7 +224,7 @@ def create_tables():
     Create the call center schema tables for when creating or loading the MLRun project.
     """
     # Create an engine:
-    engine = DBEngine(mlrun.get_or_create_ctx("create_tables"))
+    engine = DBEngine()
     # Create the schema's tables
     Base.metadata.create_all(engine.engine)
 
