@@ -67,7 +67,7 @@ def deploy_vizro_application():
 
 
 def _prepare_vizro_source(dir_name: str):
-    clients_df = get_clients(mlrun.get_or_create_ctx("mlrun"))
+    clients_df = get_clients()
     calls_df = get_calls()
     vizro_df = pd.merge(
         calls_df,
