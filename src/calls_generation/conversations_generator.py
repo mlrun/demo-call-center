@@ -31,7 +31,6 @@ WORDS_IN_1_MINUTE = 240
 
 
 def generate_conversations(
-    context: mlrun.MLClientCtx,
     amount: int,
     agent_data: pd.DataFrame,
     client_data: pd.DataFrame,
@@ -48,7 +47,6 @@ def generate_conversations(
     """
     Generates a list of conversations between an internet provider call center and a customer.
 
-    :param context:             The MLRun context.
     :param amount:              The number of conversations to generate.
     :param agent_data:          The agent data to use for the conversations.
     :param client_data:         The client data to use for the conversations.
@@ -124,8 +122,8 @@ def generate_conversations(
     )
 
     # Load the OpenAI model using langchain:
-    os.environ["OPENAI_API_KEY"] = context.get_secret(key=ProjectSecrets.OPENAI_API_KEY)
-    os.environ["OPENAI_API_BASE"] = context.get_secret(
+    os.environ["OPENAI_API_KEY"] = mlrun.get_secret_or_env(key=ProjectSecrets.OPENAI_API_KEY)
+    os.environ["OPENAI_API_BASE"] = mlrun.get_secret_or_env(
         key=ProjectSecrets.OPENAI_API_BASE
     )
     llm = ChatOpenAI(model=model_name)
