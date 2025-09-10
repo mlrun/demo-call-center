@@ -219,12 +219,13 @@ class DBEngine:
                 pass
 
 
-def create_tables():
+def create_tables(project_name: str):
     """
     Create the call center schema tables for when creating or loading the MLRun project.
     """
     # Create an engine:
-    engine = DBEngine(mlrun.get_or_create_ctx("create_tables"))
+    engine = DBEngine(mlrun.get_or_create_ctx("create_tables", project=project_name))
+    
     # Create the schema's tables
     Base.metadata.create_all(engine.engine)
 

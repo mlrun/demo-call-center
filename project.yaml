@@ -61,7 +61,7 @@ spec:
     source_code_target_dir: /home/mlrun_code/
     image: .mlrun-project-image-call-center-demo
     base_image: mlrun/mlrun-kfp
-  origin_url: git://github.com/mlrun/demo-call-center.git#refs/heads/main
+  origin_url: git://github.com/mlrun/demo-call-center.git#guy1992l-correction
   workflows:
   - image: .mlrun-project-image-call-center-demo
     name: calls-generation
@@ -71,10 +71,10 @@ spec:
     path: ./src/workflows/calls_analysis.py
   params:
     build_image: false
-    source: git://github.com/mlrun/demo-call-center.git#main
+    source: git://github.com/mlrun/demo-call-center.git#guy1992l-correction
     gpus: 0
     use_sqlite: false
     default_image: .mlrun-project-image-call-center-demo
-  source: git://github.com/mlrun/demo-call-center.git#main
+  source: git://github.com/mlrun/demo-call-center.git#guy1992l-correction
   conda: ''
   default_image: .mlrun-project-image-call-center-demo

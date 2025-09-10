@@ -118,7 +118,7 @@ def setup(
     app.save()
 
     # Create the DB tables:
-    create_tables()
+    create_tables(project_name=project.name)
 
     # Save and return the project:
     project.save()
