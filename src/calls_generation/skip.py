@@ -33,7 +33,7 @@ def skip_and_import_local_data(language: str):
     project = mlrun.get_current_project()
 
     # clean and recreate database tables:
-    engine = DBEngine(mlrun.get_or_create_ctx("skip"))
+    engine = DBEngine()
     Call.__table__.drop(engine.engine)
     Client.__table__.drop(engine.engine)
     Agent.__table__.drop(engine.engine)
@@ -139,7 +139,7 @@ def skip_and_import_local_data(language: str):
 
 def _insert_agents_and_clients_to_db(agents: list, clients: list):
     # Create an engine:
-    engine = DBEngine(mlrun.get_or_create_ctx("skip"))
+    engine = DBEngine()
 
     # Initialize a session maker:
     session = engine.get_session()

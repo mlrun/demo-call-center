@@ -180,9 +180,9 @@ class Call(Base):
 
 
 class DBEngine:
-    def __init__(self, context: mlrun.MLClientCtx):
-        self.bucket_name = context.get_secret(key=ProjectSecrets.S3_BUCKET_NAME)
-        self.db_url = context.get_secret(key=ProjectSecrets.MYSQL_URL)
+    def __init__(self):
+        self.bucket_name = mlrun.get_secret_or_env(key=ProjectSecrets.S3_BUCKET_NAME)
+        self.db_url = mlrun.get_secret_or_env(key=ProjectSecrets.MYSQL_URL)
         self.temp_file = None
         self.engine = self._create_engine()
         
@@ -224,16 +224,16 @@ def create_tables():
     Create the call center schema tables for when creating or loading the MLRun project.
     """
     # Create an engine:
-    engine = DBEngine(mlrun.get_or_create_ctx("create_tables"))
+    engine = DBEngine()
     # Create the schema's tables
     Base.metadata.create_all(engine.engine)
 
     engine.update_db()
 
 
-def insert_clients(context: mlrun.MLClientCtx, clients: list):
+def insert_clients(clients: list):
     # Create an engine:
-    engine = DBEngine(context)
+    engine = DBEngine()
 
     # Initialize a session maker:
     session = engine.get_session()
@@ -245,9 +245,9 @@ def insert_clients(context: mlrun.MLClientCtx, clients: list):
     engine.update_db()
 
 
-def insert_agents(context: mlrun.MLClientCtx, agents: list):
+def insert_agents(agents: list):
     # Create an engine:
-    engine = DBEngine(context)
+    engine = DBEngine()
 
     # Initialize a session maker:
     session = engine.get_session()
@@ -260,10 +260,10 @@ def insert_agents(context: mlrun.MLClientCtx, agents: list):
 
 
 def insert_calls(
-    context: mlrun.MLClientCtx, calls: pd.DataFrame
+    calls: pd.DataFrame
 ) -> Tuple[pd.DataFrame, List[str]]:
     # Create an engine:
-    engine = DBEngine(context)
+    engine = DBEngine()
 
     # Initialize a session maker:
     session = engine.get_session()
@@ -283,14 +283,13 @@ def insert_calls(
 
 
 def update_calls(
-    context: mlrun.MLClientCtx,
     status: str,
     table_key: str,
     data_key: str,
     data: pd.DataFrame,
 ):
     # Create an engine:
-    engine = DBEngine(context)
+    engine = DBEngine()
 
     # Initialize a session maker:
     session = engine.get_session()
@@ -316,9 +315,8 @@ def update_calls(
 
 
 def get_calls() -> pd.DataFrame:
-    context = mlrun.get_or_create_ctx("get_calls")
     # Create an engine:
-    engine = DBEngine(context)
+    engine = DBEngine()
 
     # Initialize a session maker:
     session = engine.get_session()
@@ -330,9 +328,9 @@ def get_calls() -> pd.DataFrame:
     return calls
 
 
-def get_agents(context: mlrun.MLClientCtx) -> list:
+def get_agents() -> list:
     # Create an engine:
-    engine = DBEngine(context)
+    engine = DBEngine()
 
     # Initialize a session maker:
     session = engine.get_session()
@@ -343,9 +341,9 @@ def get_agents(context: mlrun.MLClientCtx) -> list:
     return agents
 
 
-def get_clients(context: mlrun.MLClientCtx) -> list:
+def get_clients() -> list:
     # Create an engine:
-    engine = DBEngine(context)
+    engine = DBEngine()
 
     # Initialize a session maker:
     session = engine.get_session()
