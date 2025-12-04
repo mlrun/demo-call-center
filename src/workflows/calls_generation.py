@@ -68,7 +68,7 @@ def pipeline(
                     f"last_name: in {language}, no special characters",
                     "phone_number",
                     "email",
-                    "client_id: no leading zeros",
+                    "client_id: no leading zeros, at least 8 digits long, only numbers, this is a primay key field for the database, avoid duplicates as much as possible",
                     "client_city: Enter city, state in the US (e.g., Austin, TX), Not only Texas",
                     "latitude: That correspond to the city",
                     "longitude: That correspond to the city",
@@ -103,7 +103,7 @@ def pipeline(
                 "fields": [
                     f"first_name: in {language}, no special characters",
                     f"last_name: in {language}, no special characters",
-                    "agent_id: no leading zeros",
+                    "agent_id: no leading zeros, at least 8 digits long, only numbers, this is a primay key field for the database, avoid duplicates as much as possible",
                 ],
             },
             returns=["agents: file"],

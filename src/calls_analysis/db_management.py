@@ -225,6 +225,8 @@ def create_tables():
     """
     # Create an engine:
     engine = DBEngine()
+    # Create the schema's tables if it already exits, drop it
+    Base.metadata.drop_all(engine.engine)
     # Create the schema's tables
     Base.metadata.create_all(engine.engine)
 
