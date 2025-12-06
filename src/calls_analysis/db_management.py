@@ -275,6 +275,7 @@ def insert_calls(
 
     # Insert the new calls into the table and commit:
     with session.begin() as sess:
+        sess.execute(delete(Call))
         sess.execute(insert(Call), records)
 
     engine.update_db()
