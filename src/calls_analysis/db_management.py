@@ -242,6 +242,7 @@ def insert_clients(clients: list):
 
     # Insert the new calls into the table and commit:
     with session.begin() as sess:
+        sess.execute(delete(Client))
         sess.execute(insert(Client), clients)
 
     engine.update_db()
@@ -256,6 +257,7 @@ def insert_agents(agents: list):
 
     # Insert the new calls into the table and commit:
     with session.begin() as sess:
+        sess.execute(delete(Agent))
         sess.execute(insert(Agent), agents)
 
     engine.update_db()
