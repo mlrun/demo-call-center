@@ -32,6 +32,7 @@ from sqlalchemy import (
     insert,
     select,
     update,
+    delete,
 )
 from sqlalchemy.orm import (
     Mapped,
