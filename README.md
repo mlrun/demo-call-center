@@ -19,14 +19,14 @@ Most of the functions are imported from [MLRun's hub](https://https://www.mlrun.
 ## Prerequisites
 
 This demo uses:
+
 * [**OpenAI's Whisper**](https://openai.com/research/whisper) &mdash; To transcribe the audio calls into text.
 * [**Flair**](https://flairnlp.github.io/) and [**Microsoft's Presidio**](https://microsoft.github.io/presidio/) &mdash; To recognize PII so it can be filtered out.
 * [**HuggingFace**](https://huggingface.co/) &mdash; The main machine-learning framework to get the model and tokenizer for the features extraction. 
-* [**MLRun**](https://www.mlrun.org/) &mdash; as the orchestrator to operationalize the workflow.
-
-- This demo requires MLRun 1.9 and higher, Python 3.11, with CPU or GPU, a MySQL database.
-- MySQL database. SQLite is not currently supported.
-
+* [**Vizro**](https://vizro.mckinsey.com/) &mdash; To view the call center DB and transcriptions, and to play the generated conversations. 
+* [**MLRun**](https://www.mlrun.org/) &mdash; the orchestrator to operationalize the workflow. MLRun 1.9 and higher, Python 3.11, with CPU or GPU.
+* [**SQLAlchemy**](https://www.sqlalchemy.org/) &mdash; Manage the MySQL DB of calls, clients and agents. Installed together with MLRun.
+- MySQL database. Installed together with MLRun. (SQLite is not currently supported.)
 
 <a id="installation"></a>
 ## Installation
@@ -69,33 +69,26 @@ For MLRun to run properly, set up your client environment. This is not required 
 Your environment should include `MLRUN_ENV_FILE=<absolute path to the ./mlrun.env file> ` (point to the mlrun .env file 
 in this repo); see [mlrun client setup](https://docs.mlrun.org/en/latest/install/remote.html) instructions for details.  
      
-Note: You can also use a remote MLRun service (over Kubernetes): instead of starting a local mlrun: 
+> Note: You can also use a remote MLRun service (over Kubernetes): instead of starting a local mlrun: 
 edit the [mlrun.env](./mlrun.env) and specify its address and credentials.
 
 ### Install the requirements
-
-This demo requires:
-* [**MLRun**](https://www.mlrun.org/) &mdash; Orchestrate the demo's workflows.
-* [**SQLAlchemy**](https://www.sqlalchemy.org/) &mdash; Manage the MySQL DB of calls, clients and agents.
-* [**Vizro**](https://vizro.mckinsey.com/) &mdash; To view the call center DB and transcriptions, and to play the generated conversations.
 
 ```
 !pip install SQLAlchemy==2.0.31 pymysql dotenv
 ```
 ### Setup
-Please set the following configuration - choose compute device: CPU or GPU, choose the language of the calls, and whether to skip the calls generation workflow and use pre-generated data.
+Set the following configuration: choose compute device: CPU or GPU; choose the language of the calls; and whether to skip the calls generation workflow and use pre-generated data.
 
 #### Setup in Iguazio cluster
 
-- This demo is limited to run with MLRun 1.9.x Python 3.11, with CPU or GPU, a mysql database and run the pipeline with `engine = "remote"`.
-- Need to setup a MySQL database for the demo. SQLite is not currently supported.
 - Set `run_with_gpu = False`, `use_sqlite = False`, `engine = "remote"`.
 - .env must include OPENAI_API_KEY, OPENAI_API_BASE, and MYSQL_URL.
 
 #### Setup in Platform McK
 
-- GPU is not supported at the moment.
-- SQLite is supported.
+Differences between installing on Iguazio cluster and Platform McKinsey:
+- SQLite is supported
 - Set `run_with_gpu = False`, `use_sqlite = True`, `engine = "remote"`.
 - .env include OPENAI_API_KEY, OPENAI_API_BASE, and S3_BUCKET_NAME.
 
@@ -112,15 +105,15 @@ Tokens are required to run the demo end-to-end:
 
 * [MySQL](https://www.mysql.com/) &mdash; A URL with username and password for collecting the calls into the DB.
     * `MYSQL_URL`
-> If you wish to install mysql using helm chart you can use the command below - 
+> If you want to install mysql using helm chart, use this command:
 > * `helm install -n <"namesapce"> myrelease bitnami/mysql --set auth.rootPassword=sql123 --set auth.database=mlrun_demos --set primary.service.ports.mysql=3111 --set primary.persistence.enabled=false`
-> * Example for MYSQL_URL if you use the above command - `mysql+pymysql://root:sql123@myrelease-mysql.<"namesapce">.svc.cluster.local:3111/mlrun_demos`
+> Example for MYSQL_URL if you use the above command - `mysql+pymysql://root:sql123@myrelease-mysql.<"namesapce">.svc.cluster.local:3111/mlrun_demos`
 
 For Platform Mck, an S3 bucket name needs to be in the `.env`
 * [S3 Bucket]() &mdash; 
   * `S3_BUCKET_NAME`
 
-
+### Install
 ```
   # True = run with GPU, False = run with CPU
 run_with_gpu = False
@@ -152,7 +145,7 @@ if not mlrun.mlconf.is_ce_mode():
 else:
     use_sqlite = True
     ```
-
+```
 
 ## Demo flow
 
