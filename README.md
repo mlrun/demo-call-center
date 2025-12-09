@@ -1,4 +1,4 @@
-# MLRun's Call Center Demo
+# Call center demo
 
 This demo showcases how to use LLMs to turn audio files from call center conversations between customers and agents into valuable data, all in a single workflow orchestrated by MLRun. It illustrates the potential power of LLMs for feature extraction, and the simplicity of working with MLRun.
 
@@ -36,7 +36,7 @@ This project can run in different development environments:
 * Inside GitHub Codespaces 
 * Other managed Jupyter environments
 
-### Install the code and the mlrun client 
+### Install the code and the MLRun client 
 
 To get started, fork this repo into your GitHub account and clone it into your development environment.
 
@@ -72,7 +72,7 @@ in this repo); see [mlrun client setup](https://docs.mlrun.org/en/stable/install
 > Note: You can also use a remote MLRun service (over Kubernetes): instead of starting a local mlrun: 
 edit the [mlrun.env](./mlrun.env) and specify its address and credentials.
 
-### Install the requirements
+### Install SQAlchemy
 
 ```
 !pip install SQLAlchemy==2.0.31 pymysql dotenv
@@ -142,7 +142,6 @@ if not mlrun.mlconf.is_ce_mode():
     use_sqlite = False
 else:
     use_sqlite = True
-    ```
 ```
 
 ## Demo flow
@@ -160,12 +159,12 @@ else:
 - **Notebook**: [call-center-demo.ipynb](call-center-demo.ipynb)
 - **Description**: Generate the call data. (You can choose to skip this step ans use call data that is already generated and available in the demo.)
 - **Key steps**: To generate data, run: Agents & clients data generator, Insert agents & clients data to DB, Get agents & clients from DB, Conversation generation, Text to Audio, and Batch Creation. and Batch creation. Then run the workflow.
-- 
+
 - **Key files**:
   - [Insert agents & clients data to the DB and Get agents & clients from the DB](.src/calls_analysis/data_management.py)
   - [Conversation generation and Batch creation](./src/calls_generation/conversations_generator.py)
 
-- **MLRun functions:**
+- **MLRun hub functions:**
   - [Agents & Clients Data Generator](https://www.mlrun.org/hub/functions/master/structured_data_generator/)
   - [Text to audio](https://www.mlrun.org/hub/functions/master/text_to_audio_generator/)
 
@@ -180,7 +179,7 @@ else:
   - [Insert the calls data to the DB](.src/calls_analysis/db_management.py)
   - [Postprocess analysis answers](.src/postprocess.py)
 
-- **MLRun functions:**
+- **MLRun hub functions:**
   - [Perform speech diarization](https://www.mlrun.org/hub/functions/master/silero_vad)
   - [Transcribe](https://www.mlrun.org/hub/functions/master/transcribe)
   - [Recognize PII](https://www.mlrun.org/hub/functions/master/pii_recognizer)
