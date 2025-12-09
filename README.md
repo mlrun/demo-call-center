@@ -67,7 +67,7 @@ If your environment is minimal, run mlrun as a process (no UI):
 For MLRun to run properly, set up your client environment. This is not required when using **codespaces**, the mlrun **conda** environment, or **iguazio** managed notebooks.
 
 Your environment should include `MLRUN_ENV_FILE=<absolute path to the ./mlrun.env file> ` (point to the mlrun .env file 
-in this repo); see [mlrun client setup](https://docs.mlrun.org/en/latest/install/remote.html) instructions for details.  
+in this repo); see [mlrun client setup](https://docs.mlrun.org/en/stable/install/remote.html) instructions for details.  
      
 > Note: You can also use a remote MLRun service (over Kubernetes): instead of starting a local mlrun: 
 edit the [mlrun.env](./mlrun.env) and specify its address and credentials.
@@ -78,48 +78,46 @@ edit the [mlrun.env](./mlrun.env) and specify its address and credentials.
 !pip install SQLAlchemy==2.0.31 pymysql dotenv
 ```
 ### Setup
-Set the following configuration: choose compute device: CPU or GPU; choose the language of the calls; and whether to skip the calls generation workflow and use pre-generated data.
+Set the following configuration: choose compute device: CPU or GPU; choose the language of the calls; and whether to skip the calls generation workflow and use pre-generated data. For example:
 
-#### Setup in Iguazio cluster
-
-- Set `run_with_gpu = False`, `use_sqlite = False`, `engine = "remote"`.
-- .env must include OPENAI_API_KEY, OPENAI_API_BASE, and MYSQL_URL.
+```
+# True = run with GPU, False = run with CPU
+run_with_gpu = False
+use_sqlite = False
+engine = "remote
+language = "en" # The languages of the calls, es - Spanish, en - English
+skip_calls_generation = False
+```
 
 #### Setup in Platform McK
 
 Differences between installing on Iguazio cluster and Platform McKinsey:
 - SQLite is supported
 - Set `run_with_gpu = False`, `use_sqlite = True`, `engine = "remote"`.
-- .env include OPENAI_API_KEY, OPENAI_API_BASE, and S3_BUCKET_NAME.
+- `.env` must include `OPENAI_API_KEY`, `OPENAI_API_BASE`, and `S3_BUCKET_NAME`.
+  * [S3 Bucket]() &mdash; 
+  * `S3_BUCKET_NAME`
 
 ### Configure the tokens and URL
 
 > **⚠️ Important** Fill in the following variables in your `.env` file.
 
+> Note: The requirement for the OpenAI token will be removed soon in favor of an open-source LLM.
+
 Tokens are required to run the demo end-to-end:
 * [OpenAI ChatGPT](https://chat.openai.com/) &mdash; To generate conversations, two tokens are required:
   * `OPENAI_API_KEY`
   * `OPENAI_API_BASE`
-  
-> Note: The requirement for the OpenAI token will be removed soon in favor of an open-source LLM.
-
 * [MySQL](https://www.mysql.com/) &mdash; A URL with username and password for collecting the calls into the DB.
     * `MYSQL_URL`
+    
 > If you want to install mysql using helm chart, use this command:
 > * `helm install -n <"namesapce"> myrelease bitnami/mysql --set auth.rootPassword=sql123 --set auth.database=mlrun_demos --set primary.service.ports.mysql=3111 --set primary.persistence.enabled=false`
-> Example for MYSQL_URL if you use the above command - `mysql+pymysql://root:sql123@myrelease-mysql.<"namesapce">.svc.cluster.local:3111/mlrun_demos`
+> Example for MYSQL_URL if you use the above command:</br>
+`mysql+pymysql://root:sql123@myrelease-mysql.<"namesapce">.svc.cluster.local:3111/mlrun_demos`
 
-For Platform Mck, an S3 bucket name needs to be in the `.env`
-* [S3 Bucket]() &mdash; 
-  * `S3_BUCKET_NAME`
 
-### Install
-```
-  # True = run with GPU, False = run with CPU
-run_with_gpu = False
-language = "en" # The languages of the calls, es - Spanish, en - English
-skip_calls_generation = False
-```
+### Import
 
 ```
 import dotenv
