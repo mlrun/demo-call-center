@@ -248,7 +248,7 @@ def _set_function(
 def _set_calls_generation_functions(
     project: mlrun.projects.MlrunProject,
     node_name: str = None,
-    image: str = ".mlrun-project-image-zzz"
+    image: str = ".mlrun-project-image"
 ):
     # Client and agent data generator
     _set_function(
@@ -288,7 +288,7 @@ def _set_calls_analysis_functions(
     gpus: int,
     node_name: str = None,
     node_selector: dict = None,
-    image: str = ".mlrun-project-image-zzz"
+    image: str = ".mlrun-project-image"
 ):
     # DB management:
     _set_function(
