@@ -32,6 +32,7 @@ from sqlalchemy import (
     insert,
     select,
     update,
+    delete,
 )
 from sqlalchemy.orm import (
     Mapped,
@@ -225,6 +226,8 @@ def create_tables():
     """
     # Create an engine:
     engine = DBEngine()
+    # Create the schema's tables if it already exits, drop it
+    # Base.metadata.drop_all(engine.engine)
     # Create the schema's tables
     Base.metadata.create_all(engine.engine)
 
@@ -240,6 +243,8 @@ def insert_clients(clients: list):
 
     # Insert the new calls into the table and commit:
     with session.begin() as sess:
+        sess.execute(delete(Call))
+        sess.execute(delete(Client))
         sess.execute(insert(Client), clients)
 
     engine.update_db()
@@ -254,6 +259,8 @@ def insert_agents(agents: list):
 
     # Insert the new calls into the table and commit:
     with session.begin() as sess:
+        sess.execute(delete(Call))
+        sess.execute(delete(Agent))
         sess.execute(insert(Agent), agents)
 
     engine.update_db()
@@ -273,6 +280,7 @@ def insert_calls(
 
     # Insert the new calls into the table and commit:
     with session.begin() as sess:
+        sess.execute(delete(Call))
         sess.execute(insert(Call), records)
 
     engine.update_db()
