@@ -232,7 +232,7 @@ def create_tables():
     Base.metadata.create_all(engine.engine)
 
     engine.update_db()
-
+    print('tables created!')
 
 def insert_clients(clients: list):
     # Create an engine:

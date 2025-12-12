@@ -20,6 +20,7 @@ from src.calls_analysis.db_management import create_tables
 from src.common import ProjectSecrets
 
 CE_MODE = mlrun.mlconf.is_ce_mode()
+print(f'CE_MODE = {CE_MODE}')
 
 def setup(
     project: mlrun.projects.MlrunProject,
@@ -60,9 +61,9 @@ def setup(
             )
             os.environ["S3_BUCKET_NAME"] = bucket_name
         else:
-            os.environ["MYSQL_URL"] = f"sqlite:///{os.path.abspath('.')}/data/sqlite.db"
+            os.environ["MYSQL_URL"] = f"sqlite:////User/demo-call-center/data/sqlite.db"
             mysql_url = os.environ["MYSQL_URL"]
-
+            print(f'mysql_url = {mysql_url}')
     # Set the project git source:
     if source:
         print(f"Project Source: {source}")
@@ -241,6 +242,7 @@ def _set_function(
     if not CE_MODE and apply_auto_mount:
         # Apply auto mount:
         mlrun_function.apply(mlrun.auto_mount())
+        print('apply(mlrun.auto_mount()')
     # Save:
     mlrun_function.save()
 
