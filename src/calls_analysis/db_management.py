@@ -15,7 +15,6 @@ import datetime
 import os
 import tempfile
 from typing import List, Optional, Tuple
-
 import boto3
 import mlrun
 import pandas as pd
@@ -184,6 +183,7 @@ class DBEngine:
     def __init__(self):
         self.bucket_name = mlrun.get_secret_or_env(key=ProjectSecrets.S3_BUCKET_NAME)
         self.db_url = mlrun.get_secret_or_env(key=ProjectSecrets.MYSQL_URL)
+        self.project = None
         self.temp_file = None
         self.engine = self._create_engine()
         
@@ -194,22 +194,27 @@ class DBEngine:
         if self.bucket_name:
             s3 = boto3.client("s3")
             s3.upload_file(self.temp_file.name, self.bucket_name, "sqlite.db")
+        else:
+            # register the temp sqlite.db to project artifact
+            self.project.log_artifact("sqlite-db", local_path=self.temp_file.name, upload=True)
 
     def _create_engine(self):
+        # Create a temporary file that will persist throughout the object's lifetime
+        self.temp_file = tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False)
+        self.temp_file.close()  # Close the file but keep the name
         if self.bucket_name:
-            # Create a temporary file that will persist throughout the object's lifetime
-            self.temp_file = tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False)
-            self.temp_file.close()  # Close the file but keep the name
-
             s3 = boto3.client("s3")
             try:
                 s3.download_file(self.bucket_name, "sqlite.db", self.temp_file.name)
             except Exception as e:
                 print(f"Warning: Could not download database from S3: {e}")
-
-            return create_engine(f"sqlite:///{self.temp_file.name}")
         else:
-            return create_engine(url=self.db_url)
+            #iguazio platform get artifact to local
+            self.project = mlrun.get_current_project()
+            with open(self.temp_file.name, 'wb') as tmpfile:
+                tmpfile.write(self.project.get_artifact('sqlite-db').to_dataitem().get())
+
+        return create_engine(f"sqlite:///{self.temp_file.name}")
 
     def __del__(self):
         # Clean up the temporary file when the object is destroyed
@@ -230,9 +235,8 @@ def create_tables():
     # Base.metadata.drop_all(engine.engine)
     # Create the schema's tables
     Base.metadata.create_all(engine.engine)
-
+    print('Tables created!')
     engine.update_db()
-    print('tables created!')
 
 def insert_clients(clients: list):
     # Create an engine:

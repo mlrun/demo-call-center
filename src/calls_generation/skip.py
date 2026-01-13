@@ -29,14 +29,18 @@ def skip_and_import_local_data(language: str):
     """
     # Get the example data directory:
     example_data_dir = Path("data")
+    
     # Get the project:
     project = mlrun.get_current_project()
 
     # clean and recreate database tables:
     engine = DBEngine()
+    print(f"in skip_and_import_local_data engine: {engine}")
+    print(f"in skip_and_import_local_data engine.engine: {engine.engine}")
     Call.__table__.drop(engine.engine)
     Client.__table__.drop(engine.engine)
     Agent.__table__.drop(engine.engine)
+    print(f"in skip_and_import_local_data all tables fropped")
     create_tables()
     print("- Initialized tables")
 
@@ -84,7 +88,7 @@ def skip_and_import_local_data(language: str):
     clients = yaml.load(clients.get(), Loader=yaml.FullLoader)
 
     # insert agent and client data to database:
-    _insert_agents_and_clients_to_db(agents, clients)
+    _insert_agents_and_clients_to_db(engine, agents, clients)
     print("- agents and clients inserted")
 
     # log zip files
@@ -137,9 +141,10 @@ def skip_and_import_local_data(language: str):
     print("*** first workflow skipped successfully ***")
 
 
-def _insert_agents_and_clients_to_db(agents: list, clients: list):
+def _insert_agents_and_clients_to_db(engine: DBEngine, agents: list, clients: list):
     # Create an engine:
     engine = DBEngine()
+    print(f'engin: {engine} created.')
 
     # Initialize a session maker:
     session = engine.get_session()
@@ -148,7 +153,7 @@ def _insert_agents_and_clients_to_db(agents: list, clients: list):
     with session.begin() as sess:
         sess.execute(insert(Agent), agents)
         sess.execute(insert(Client), clients)
-
+    engine.update_db()
 
 # TODO: change to export the actual data and not the artifacts
 def save_current_example_data():
