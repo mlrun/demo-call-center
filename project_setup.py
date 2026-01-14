@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import boto3
 import mlrun
+import tempfile
 
 from src.calls_analysis.db_management import create_tables
 from src.common import ProjectSecrets
@@ -36,15 +37,15 @@ def setup(
     openai_key = os.getenv(ProjectSecrets.OPENAI_API_KEY)
     openai_base = os.getenv(ProjectSecrets.OPENAI_API_BASE)
     mysql_url = os.getenv(ProjectSecrets.MYSQL_URL, "")
-
     # Unpack parameters:
     source = project.get_param(key="source")
-    default_image = project.get_param(key="default_image", default=None)
+    default_image = project.get_param(key="default_image", default=".mlrun-project-image-call-center-demo")
     build_image = project.get_param(key="build_image", default=False)
     gpus = project.get_param(key="gpus", default=0)
     node_name = project.get_param(key="node_name", default=None)
     node_selector = project.get_param(key="node_selector", default=None)
-    use_sqlite = project.get_param(key="use_sqlite", default=False)
+    use_sqlite = project.get_param(key="use_sqlite", default=True)
+    skip_calls_generation = project.get_param(key="skip_calls_generation", default=False)
 
     # Update sqlite data:
     if use_sqlite:
@@ -53,15 +54,16 @@ def setup(
             s3 = boto3.client("s3") if not os.getenv("AWS_ENDPOINT_URL_S3") else boto3.client('s3', endpoint_url=os.getenv("AWS_ENDPOINT_URL_S3"))
             bucket_name = Path(mlrun.mlconf.artifact_path).parts[1]
             # Upload the file
-            s3.upload_file(
-                Filename="data/sqlite.db",
-                Bucket=bucket_name,
-                Key="sqlite.db",
-            )
+            if not skip_calls_generation and Path("./data/sqlite.db").exists():
+                s3.upload_file(
+                    Filename="data/sqlite.db",
+                    Bucket=bucket_name,
+                    Key="sqlite.db",
+                )
             os.environ["S3_BUCKET_NAME"] = bucket_name
         else:
-            os.environ["MYSQL_URL"] = f"sqlite:///{os.path.abspath('.')}/data/sqlite.db"
-            mysql_url = os.environ["MYSQL_URL"]
+            if not skip_calls_generation and Path("./data/sqlite.db").exists():
+                project.log_artifact("sqlite-db", local_path="./data/sqlite.db", upload=True)
 
     # Set the project git source:
     if source:
@@ -72,6 +74,7 @@ def setup(
     # Set default image:
     if default_image:
         project.set_default_image(default_image)
+        print(f"set default image to : {default_image}")
 
     # Build the image:
     if build_image:
@@ -117,11 +120,12 @@ def setup(
     ]
     app.save()
 
-    # Create the DB tables:
-    create_tables()
+    # # Create the DB tables:
+    # create_tables()
 
     # Save and return the project:
     project.save()
+
     return project
 
 def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_image):
@@ -133,7 +137,8 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_i
     # Define commands in logical groups while maintaining order
     system_commands = [
         # Update apt-get to install ffmpeg (support audio file formats):
-        "apt-get update -y && apt-get install ffmpeg -y"
+        "apt-get update -y && apt-get install ffmpeg -y",
+        "python --version"
     ]
 
     infrastructure_requirements = [
@@ -150,16 +155,17 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_i
     ] if with_gpu else []
 
     other_requirements = [
-        "pip install mlrun langchain==0.2.17 openai==1.58.1 langchain_community==0.2.19 pydub==0.25.1 streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.1 librosa==0.10.1 presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0 htbuilder==0.6.2",
+        "pip install langchain==0.2.17 openai==1.58.1 langchain_community==0.2.19 pydub==0.25.1 streamlit==1.28.0 st-annotated-text==4.0.1 spacy==3.7.1 librosa==0.10.1 presidio-anonymizer==2.2.34 presidio-analyzer==2.2.34 nltk==3.8.1 flair==0.13.0 htbuilder==0.6.2",
         "pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1.tar.gz",
         # "python -m spacy download en_core_web_lg",
 
         "pip install SQLAlchemy==2.0.31 pymysql requests_toolbelt==0.10.1",
         "pip uninstall -y onnxruntime-gpu onnxruntime",
         f"pip install {config['onnx_package']}",
-        "pip uninstall -y protobuf",
-        "pip install protobuf"
-    ]    
+        "pip show protobuf",
+    ]
+    if not CE_MODE:
+        other_requirements.extend(["pip uninstall -y protobuf", "pip install protobuf", "pip show protobuf"])
 
     # Combine commands in the required order
     commands = (
@@ -178,7 +184,6 @@ def _build_image(project: mlrun.projects.MlrunProject, with_gpu: bool, default_i
         set_as_default=True,
         overwrite_build_params=True
     )
-    
     
 def _set_secrets(
     project: mlrun.projects.MlrunProject,
@@ -241,6 +246,7 @@ def _set_function(
     if not CE_MODE and apply_auto_mount:
         # Apply auto mount:
         mlrun_function.apply(mlrun.auto_mount())
+
     # Save:
     mlrun_function.save()
 
@@ -248,7 +254,7 @@ def _set_function(
 def _set_calls_generation_functions(
     project: mlrun.projects.MlrunProject,
     node_name: str = None,
-    image: str = ".mlrun-project-image"
+    image: str = ".mlrun-project-image-call-center-demo"
 ):
     # Client and agent data generator
     _set_function(
@@ -256,6 +262,7 @@ def _set_calls_generation_functions(
         func="hub://structured_data_generator",
         name="structured-data-generator",
         kind="job",
+        image=image,
         node_name=node_name,
         apply_auto_mount=True,
     )
@@ -355,7 +362,6 @@ def _set_calls_analysis_functions(
 
 
 def _set_workflows(project: mlrun.projects.MlrunProject, image):
-
     project.set_workflow(
         name="calls-generation", workflow_path="./src/workflows/calls_generation.py", image=image
     )
