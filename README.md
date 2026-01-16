@@ -10,11 +10,11 @@ The demo demonstrates two usages of GenAI:
 - Unstructured data generation: Generating audio data with ground truth metadata to evaluate the analysis.
 - Unstructured data analysis: Turning audio calls into text and tabular features.
 
-The demo contains a single [notebook](./call-center-demo.ipynb) that encompasses the entire demo.
+The demo contains two notebooks [notebook 1](./notebook_1_generation.ipynb) and [notebook 2](./notebook_2_analysis.ipynb).
 
 Most of the functions are imported from [MLRun's hub](https://https://www.mlrun.org/hub/), which contains a wide range of functions and modules that can be used for a variety of use cases. See also the [MLRun hub documentation](https://docs.mlrun.org/en/stable/runtimes/load-from-hub.html). All functions used in the demo include links to their source in the hub. All of the python source code is under [/src](./src).
 
-> **⚠️ Important This demo can take an hour to complete when running without GPUs.**
+> **⚠️ Important This demo can take up to couple of hours to complete when running without GPUs.**
 
 ## Prerequisites
 
@@ -26,9 +26,8 @@ This demo uses:
 * [**Vizro**](https://vizro.mckinsey.com/) &mdash; To view the call center DB and transcriptions, and to play the generated conversations. 
 * [**MLRun**](https://www.mlrun.org/) &mdash; the orchestrator to operationalize the workflow. MLRun 1.9 and higher, Python 3.11, with CPU or GPU.
 * [**SQLAlchemy**](https://www.sqlalchemy.org/) &mdash; Manage the MySQL DB of calls, clients and agents. Installed together with MLRun.
-- MySQL database. Installed together with MLRun. (SQLite is not currently supported.)
+- SQLite
 
-<a id="installation"></a>
 ## Installation
 
 This project can run in different development environments:
@@ -54,7 +53,8 @@ Make sure you open the notebooks and select the `mlrun` conda environment
 
 The MLRun service and computation can run locally (minimal setup) or over a remote Kubernetes environment.
 
-If your development environment supports Docker and there are sufficient CPU resources, run:
+
+If your development environment supports Docker and there are sufficient CPU resources (support for Docker setup will be deprecated), run:
 
     make mlrun-docker
     
@@ -72,31 +72,11 @@ in this repo); see [mlrun client setup](https://docs.mlrun.org/en/stable/install
 > Note: You can also use a remote MLRun service (over Kubernetes): instead of starting a local mlrun: 
 edit the [mlrun.env](./mlrun.env) and specify its address and credentials.
 
-### Install SQAlchemy
 
-```
-!pip install SQLAlchemy==2.0.31 pymysql dotenv
-```
-### Setup
-Set the following configuration: choose compute device: CPU or GPU; choose the language of the calls; and whether to skip the calls generation workflow and use pre-generated data. For example:
+#### Setup
 
-```
-# True = run with GPU, False = run with CPU
-run_with_gpu = False
-use_sqlite = False
-engine = "remote
-language = "en" # The languages of the calls, es - Spanish, en - English
-skip_calls_generation = False
-```
-
-#### Setup in Platform McK
-
-Differences between installing on Iguazio cluster and Platform McKinsey:
-- SQLite is supported
 - Set `run_with_gpu = False`, `use_sqlite = True`, `engine = "remote"`.
-- `.env` must include `OPENAI_API_KEY`, `OPENAI_API_BASE`, and `S3_BUCKET_NAME`.
-  * [S3 Bucket]() &mdash; 
-  * `S3_BUCKET_NAME`
+- `.env` must include `OPENAI_API_KEY`, `OPENAI_API_BASE`
 
 ### Configure the tokens and URL
 
@@ -108,55 +88,19 @@ Tokens are required to run the demo end-to-end:
 * [OpenAI ChatGPT](https://chat.openai.com/) &mdash; To generate conversations, two tokens are required:
   * `OPENAI_API_KEY`
   * `OPENAI_API_BASE`
-* [MySQL](https://www.mysql.com/) &mdash; A URL with username and password for collecting the calls into the DB.
-    * `MYSQL_URL`
-    
-> If you want to install mysql using helm chart, use this command:
-> * `helm install -n <"namesapce"> myrelease bitnami/mysql --set auth.rootPassword=sql123 --set auth.database=mlrun_demos --set primary.service.ports.mysql=3111 --set primary.persistence.enabled=false`
-> Example for MYSQL_URL if you use the above command:</br>
-`mysql+pymysql://root:sql123@myrelease-mysql.<"namesapce">.svc.cluster.local:3111/mlrun_demos`
-
-
-### Import
-
-```
-import dotenv
-import os
-import sys
-import mlrun
-dotenv_file = ".env"
-sys.path.insert(0, os.path.abspath("./"))
-
-dotenv.load_dotenv(dotenv_file)
-```
-
-```
-assert not run_with_gpu
-assert os.environ["OPENAI_API_BASE"]
-assert os.environ["OPENAI_API_KEY"]
-```
-
-```
-if not mlrun.mlconf.is_ce_mode():
-    assert os.environ["MYSQL_URL"]
-    use_sqlite = False
-else:
-    use_sqlite = True
-```
 
 ## Demo flow
 
 1. Create the project
-- **Notebook**: [call-center-demo.ipynb](call-center-demo.ipynb)
+- **Notebook**: [notebook_1_generation.ipynb](notebook_1_generation.ipynb)
 - **Description**: 
 - **Key steps**: Create the MLRun project. 
 - **Key files**:
-  - [project.yaml](./project.yaml)
   - [project_setup.py](./project_setup.py)
 
 2. Generate the call data
 
-- **Notebook**: [call-center-demo.ipynb](call-center-demo.ipynb)
+- **Notebook**: [notebook_1_generation.ipynb](notebook_1_generation.ipynb)
 - **Description**: Generate the call data. (You can choose to skip this step ans use call data that is already generated and available in the demo.)
 - **Key steps**: To generate data, run: Agents & clients data generator, Insert agents & clients data to DB, Get agents & clients from DB, Conversation generation, Text to Audio, and Batch Creation. and Batch creation. Then run the workflow.
 
@@ -170,7 +114,7 @@ else:
 
 3. Calls analysis
 
-- **Notebook**: [call-center-demo.ipynb](call-center-demo.ipynb)
+- **Notebook**: [notebook_2_analysis.ipynb](notebook_2_analysis.ipynb)
 - **Description**: Insert the call data to the DB, use diarization to analyze when each person is speaking, transcribe and translate the calls into text and save them as text files, recognice and remove any PII
 , anaylze text (call center conversation) with an LLM, postprocess the LLM's answers before updating them into the DB. Then run the all analysis workflow.
 - **Key steps**: Insert the calls data to the DB, perform speech diarization, transcribe, recognize PII, analysis. Then run the workflow.
@@ -187,5 +131,5 @@ else:
 
 4. View the data
 
-- **Notebook**: [call-center-demo.ipynb](call-center-demo.ipynb)
+- **Notebook**: [notebook_2_analysis.ipynb](notebook_2_analysis.ipynb)
 - **Description**: View the data and features, as they are collected, in the MLRun UI. Deploy [Vizro](https://vizro.mckinsey.com/) to visualize the data in the DB.
