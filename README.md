@@ -12,7 +12,7 @@ The demo demonstrates two usages of GenAI:
 
 The demo contains two notebooks [notebook 1](./notebook_1_generation.ipynb) and [notebook 2](./notebook_2_analysis.ipynb).
 
-Most of the functions are imported from [MLRun's hub](https://https://www.mlrun.org/hub/), which contains a wide range of functions and modules that can be used for a variety of use cases. See also the [MLRun hub documentation](https://docs.mlrun.org/en/stable/runtimes/load-from-hub.html). All functions used in the demo include links to their source in the hub. All of the python source code is under [/src](./src).
+Most of the functions are imported from [MLRun's hub](https://www.mlrun.org/hub/), which contains a wide range of functions and modules that can be used for a variety of use cases. See also the [MLRun hub documentation](https://docs.mlrun.org/en/stable/runtimes/load-from-hub.html). All functions used in the demo include links to their source in the hub. All of the python source code is under [/src](./src).
 
 > **⚠️ Important This demo can take up to couple of hours to complete when running without GPUs.**
 
