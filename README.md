@@ -2,7 +2,7 @@
 
 This demo showcases how to use LLMs to turn audio files from call center conversations between customers and agents into valuable data, all in a single workflow orchestrated by MLRun. It illustrates the potential power of LLMs for feature extraction, and the simplicity of working with MLRun.
 
-## Overview
+## Description
 
 MLRun automates the entire workflow, auto-scales resources as needed, and automatically logs and parses values between the different workflow steps.
 
